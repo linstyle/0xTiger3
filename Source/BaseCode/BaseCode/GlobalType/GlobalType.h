@@ -12,17 +12,9 @@
 #include "CMyStackWalker.h"
 
 
-typedef unsigned __int64 MGUID;
+typedef UINT64 MGUID;
 
-typedef signed __int64 S64;
-typedef signed __int32 S32;
-typedef signed __int16 S16;
-typedef signed __int8 S8;
-
-typedef unsigned __int64 U64;
-typedef unsigned __int32 U32;
-typedef unsigned __int16 U16;
-typedef unsigned __int8 U8;
+typedef INT64  OBJID;
 
 
 #define _ALIGN(a,size) (((a)+(size)-1)&(~((size)-1)))
@@ -31,8 +23,6 @@ const unsigned int __ALIGN_SIZE_LONG = sizeof(long);		 //4×Ö½Ú¶ÔÆë,longÔÚ´ó¶àÊýÆ
 const unsigned int __ALIGN_SIZE_PAGE = __ALIGN_SIZE_LONG;     //Õâ¸öÓ¦¸ÃÓÐAPIµÃµ½°É£¿
 
 #define printu(level) printf(level##",%s::%s:%d, %d\n", __FILE__, __FUNCTION__, __LINE__, GetLastError())
-
-#define DELAY_CONTINUE(time) for(static DWORD dwOld = GetTickCount(); (GetTickCount()-dwOld)>=time; dwOld = GetTickCount() )
 
 #define FREE_NULL(p)	\
 do									\
