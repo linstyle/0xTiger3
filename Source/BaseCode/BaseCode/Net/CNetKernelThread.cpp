@@ -10,8 +10,7 @@ CNetKernelThread::CNetKernelThread()
 }
 
 CNetKernelThread::~CNetKernelThread()
-{
-	m_bThreadRun = false;
+{	
 	Release();
 }
 
@@ -21,16 +20,32 @@ void CNetKernelThread::Init()
 	InitThread();
 }
 
+void CNetKernelThread::InitThread()
+{
+	m_hThreadLoop = (HANDLE)_beginthreadex(NULL, 0, ThreadLoop, this, 0, &m_uThreadLoop);	
+	INITASSERT( 0== m_hThreadLoop);	
+}
+
 void CNetKernelThread::Release()
 {
 	ReleaseThread();
+}
+
+void CNetKernelThread::ReleaseThread()
+{
+	m_bThreadRun = false;
+
+	IFn( WAIT_FAILED==WaitForSingleObject(m_hThreadLoop, INFINITE) )
+	{
+
+	}
+	CloseHandle(m_hThreadLoop);
 }
 
 CIOCP* CNetKernelThread::GetIOCP()
 {
 	return &m_IOCP;
 }
-
 
 bool CNetKernelThread::AddClientSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect)
 {
@@ -46,21 +61,6 @@ bool CNetKernelThread::AddClientSocket(const char* pConnectIP, USHORT nConnectPo
 	pSocketClient->m_nIP = inet_addr(pConnectIP);
 	AddToClientSocketList(pSocketClient);
 	return true;
-}
-
-void CNetKernelThread::InitThread()
-{
-	m_hThreadLoop = (HANDLE)_beginthreadex(NULL, 0, ThreadLoop, this, 0, &m_uThreadLoop);	
-	INITASSERT( 0== m_hThreadLoop);	
-}
-
-void CNetKernelThread::ReleaseThread()
-{
-	IFn( WAIT_FAILED==WaitForSingleObject(m_hThreadLoop, INFINITE) )
-	{
-
-	}
-	CloseHandle(m_hThreadLoop);
 }
 
 void CNetKernelThread::AddToClientSocketList(CSocketClient *pSocketClient)

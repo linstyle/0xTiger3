@@ -6,9 +6,10 @@
 #pragma  once
 #include <winsock2.h>
 #include "LinuxList.h"
-#include "CWindowsSlabManager.h"
 #include "CCircleBuffer.h"
 #include "CLog2.0.h"
+
+//#include "CWindowsSlabManager.h"
 /*
 	分配空间的全局API
 */

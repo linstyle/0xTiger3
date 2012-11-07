@@ -17,7 +17,6 @@ void CNetAcceptThread::Init(CIOCP *pIOCP)
 {
 	m_hThreadAccept = NULL;
 	m_uThreadAccept= 0;
-	m_nSocketServerCount = 0;
 	m_pIOCP = pIOCP;
 	
 	InitThread();
@@ -45,55 +44,21 @@ void CNetAcceptThread::ReleaseThread()
 	CloseHandle(m_hThreadAccept);
 }
 
-bool CNetAcceptThread::AddSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
-{
-	if(m_nSocketServerCount>=SOCKET_SERVER_COUNT)
-	{
-		LOGNE("CNetAcceptThread::AddSocketServer. m_nSocketServerCount(%d)>=SOCKET_SERVER_COUNT(%d)\n", m_nSocketServerCount, SOCKET_SERVER_COUNT);
-		return false;
-	}
+bool CNetAcceptThread::SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
+{	
+	//服务端套接字，初始化的时候必须成功
+	memcpy(m_SocketServer.m_szName, pName, sizeof(m_SocketServer.m_szName)-1);
 
-	CSocketServer *pSocketServer = &m_SocketServer[m_nSocketServerCount];
+	m_SocketServer.m_nSocket = 0;
+	m_SocketServer.m_nIP = inet_addr(pListenIP);
+	m_SocketServer.m_nPort = htons(nListenPort);
 
-	//init
-	pSocketServer->Init();
+	m_SocketServer.m_OverlappedAccept.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	INITASSERT( !m_SocketServer.m_OverlappedAccept.hEvent );
+	INITASSERT( !CSocketAPI::InitSocketTCPS(m_SocketServer.m_nSocket, m_SocketServer.m_nIP, m_SocketServer.m_nPort));
+	INITASSERT( !InitAccpetExlpfn(&m_SocketServer));
 	
-	memcpy(pSocketServer->m_szName, pName, sizeof(pSocketServer->m_szName)-4);
-
-	pSocketServer->m_nSocket = 0;
-	pSocketServer->m_nIP = inet_addr(pListenIP);
-	pSocketServer->m_nPort = htons(nListenPort);
-
-	pSocketServer->m_OverlappedAccept.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-	IFn( NULL==pSocketServer->m_OverlappedAccept.hEvent )
-	{
-		return false;
-	}
-
-	if (false==InitSocketTCPServer(pSocketServer))
-	{
-		CloseHandle(pSocketServer->m_OverlappedAccept.hEvent);
-		return false;
-	}
-
-	if (false==InitAccpetExlpfn(pSocketServer))
-	{		
-		closesocket(pSocketServer->m_nSocket);
-		CloseHandle(pSocketServer->m_OverlappedAccept.hEvent);
-		return false;
-	}
-	
-	m_nSocketServerCount++;
-	return true;
-}
-
-bool CNetAcceptThread::InitSocketTCPServer(CSocketServer *pSocketServer)
-{
-	IFn(false==CSocketAPI::InitSocketTCPS(pSocketServer->m_nSocket, pSocketServer->m_nIP, pSocketServer->m_nPort))
-	{
-		return false;
-	}
-
 	return true;
 }
 
@@ -128,58 +93,51 @@ bool CNetAcceptThread::IOCPPostConnect(CSocketClient *pSocketClient)
 	return true;
 }
 
-CSocketServer* CNetAcceptThread::GetSocketServerByIndex(int nIndex)
+CSocketServer* CNetAcceptThread::GetSocketServer()
 {
-	IFn(nIndex>=m_nSocketServerCount)
-	{
-		return NULL;
-	}
-
-	return &m_SocketServer[nIndex];
+	return &m_SocketServer;
 }
 
 unsigned int WINAPI CNetAcceptThread::ThreadAccept(void* pParam)
 {
-	CNetAcceptThread *pNetAccept=(CNetAcceptThread*)pParam;
+	IFn(NULL==pParam)
+		return 0;
 
+	CNetAcceptThread *pNetAccept=(CNetAcceptThread*)pParam;
 	CSocketClient *pSocketClient = NULL;
+	CSocketServer* pSocketServer = pNetAccept->GetSocketServer();
+
+	IFn(NULL==pSocketServer)
+		return 0;
+
 	while(pNetAccept->m_bThreadRun)
 	{
 		//pNetAccept->m_bThreadRun，防止中途退出导致卡住
-		for (int i=0; i<pNetAccept->m_nSocketServerCount && pNetAccept->m_bThreadRun; ++i)
-		{			
-			if (NULL==pSocketClient)
-			{
-				pSocketClient = MallocSocketClientObject();
-			}
+		if (NULL==pSocketClient)
+		{
+			pSocketClient = MallocSocketClientObject();
+		}
 
-			IFn(NULL==pSocketClient)
-			{
-				Sleep(1500);
-				continue;
-			}
+		IFn(NULL==pSocketClient)
+		{
+			Sleep(1000);
+			continue;
+		}
 
-			CSocketServer* pSocketServer = pNetAccept->GetSocketServerByIndex(i);
-			if (NULL==pSocketServer)
-			{
-				continue;
-			}
+		IFn( !pSocketServer->Accept(pSocketClient) )
+		{
+			FreeSocketClientObject(pSocketClient);
+			pSocketClient = NULL;
+			continue;
+		}
 
-			if( false==pSocketServer->Accept(pSocketClient))
-			{
-				FreeSocketClientObject(pSocketClient);
-				pSocketClient = NULL;
-				continue;
-			}
+		//投递到完成端口
+		IFn( !pNetAccept->IOCPPostConnect(pSocketClient) )
+		{
+			FreeSocketClientObject(pSocketClient);
+			pSocketClient = NULL;
+		}
 			
-			//投递到完成端口
-			if ( pNetAccept->IOCPPostConnect(pSocketClient) )
-			{
-				FreeSocketClientObject(pSocketClient);
-				pSocketClient = NULL;
-			}
-			
-		}//end for
 	}//end while
 
 	return 0;

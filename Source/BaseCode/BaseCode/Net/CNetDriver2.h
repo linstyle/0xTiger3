@@ -39,14 +39,15 @@ public:
 	CNetDriver2();
 	~CNetDriver2();
 
+	void Init();
 	/*
-		@AddSocketServer
-		@增加一个监听套接字
+		@SetSocketServer
+		@增加一个监听套接字,目前只支持一个
 
 		@AddClientSocket
 		@增加一个connect套接字	
 	*/
-	bool AddSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);	
+	bool SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);	
 	bool AddClientSocket(const char* pConnectIP, USHORT nConnectPort);
 
 	/*
@@ -68,7 +69,6 @@ private:
 	/*
 		初始化、释放
 	*/
-	void Init();
 	void Release();
 	void InitSocketLib();	
 	void ReleaseSocketLib();
@@ -79,6 +79,8 @@ public:
 private:
 	CNetAcceptThread m_NetAcceptThread;
 	CNetKernelThread m_NetKernelThread;
+
+	bool m_bHasInit;
 
 };
 

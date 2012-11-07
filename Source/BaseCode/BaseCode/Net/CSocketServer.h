@@ -8,17 +8,16 @@
 #include "CLog2.0.h"
 #include <MSWSock.h>
 
-const int SOCKET_SERVER_COUNT = 32;  //支持的监听套接字
-
-
 
 class CSocketServer
 {
 public:
-	void Init();
+	CSocketServer();
+	~CSocketServer();
 	bool Accept(CSocketClient *pSocketClient);
 
 private:
+	void Init();
 	bool InitAccept(CSocketClient *pSocketClient);
 
 public:

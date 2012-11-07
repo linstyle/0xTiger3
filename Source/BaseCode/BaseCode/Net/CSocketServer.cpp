@@ -1,6 +1,16 @@
 #include "CSocketServer.h"
 #include "GlobalMacro.h"
 
+CSocketServer::CSocketServer()
+{
+	Init();
+}
+
+CSocketServer::~CSocketServer()
+{
+	closesocket(m_nSocket);
+}
+
 void CSocketServer::Init()
 {
 	memset(m_szName, 0, sizeof(m_szName));	
@@ -88,54 +98,3 @@ bool CSocketServer::InitAccept(CSocketClient *pSocketClient)
 
 	return true;
 }
-
-//
-//CSocketServerManager::CSocketServerManager()
-//{
-//	m_nSocketServerCount=0;
-//}
-//
-//CSocketServerManager::~CSocketServerManager()
-//{
-//	for (int i=0; i<m_nSocketServerCount; i++)
-//	{
-//		closesocket(m_SocketServer[i].m_nSocket);
-//	}
-//
-//}
-//
-//bool CSocketServerManager::AddSocketServer(const char* pName, ULONG nListenIP, USHORT nListenPort)
-//{
-//	if (m_nSocketServerCount>=SOCKET_SERVER_COUNT)
-//	{
-//		LOGW("Warning, CSocketServerManager::AddSocketServer. m_nSocketServerCount(%d)>=SOCKET_SERVER_COUNT(%d)\n", m_nSocketServerCount, SOCKET_SERVER_COUNT);
-//		return false;
-//	}
-//
-//	SOCKET_SERVER *pSocketServer = m_SocketServer[m_nSocketServerCount];
-//	
-//	memset(pSocketServer->m_szName, 0 ,sizeof(pSocketServer->m_szName));
-//	memcpy( pSocketServer->m_szName, pName, sizeof(pSocketServer->m_szName));
-//	pSocketServer->m_nIP = nListenIP;
-//	pSocketServer->m_nPort = nListenPort;
-//
-//	m_nSocketServerCount++;
-//
-//	return true;
-//}
-//
-//bool CSocketServerManager::AddSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
-//{
-//	if (m_nSocketServerCount>=SOCKET_SERVER_COUNT)
-//	{
-//		LOGW("Warning, CSocketServerManager::AddSocketServer. m_nSocketServerCount(%d)>=SOCKET_SERVER_COUNT(%d)\n", m_nSocketServerCount, SOCKET_SERVER_COUNT);
-//		return false;
-//	}
-//
-//	return AddSocketServer(pName, inet_addr(pListenIP), nListenPort);
-//}
-//
-//void CSocketServerManager::LoopAccept()
-//{
-//	
-//}

@@ -8,7 +8,7 @@
 
 namespace net  
 {
-	bool AddSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);	
+	bool SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);	
 	bool AddClientSocket(const char* pConnectIP, USHORT nConnectPort);
 
 	int GetPacketStream(char *pBuffer, int nBufferLen);
