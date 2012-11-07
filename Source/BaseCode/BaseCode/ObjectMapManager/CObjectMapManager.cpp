@@ -1,6 +1,5 @@
-#include "stdafx.h"
-#include "CObjectMapManager.h"
 #include "NetAPI.h"
+#include "CObjectMapManager.h"
 #include "CWindowsSlabManager.h"
 
 using namespace name_objectmap;
@@ -134,7 +133,7 @@ OBJECT_VALUE* CObjectMapManager::GetObjectValueByUserID(INT64 nUserID)
 	return ite->second;
 }
 
-bool CObjectMapManager::ChangeIdent(INT64 nUserID, IDENT nIdent)
+bool CObjectMapManager::ChangeIdent(INT64 nUserID, name_objectmap::IDENT nIdent)
 {
 	
 	return false;

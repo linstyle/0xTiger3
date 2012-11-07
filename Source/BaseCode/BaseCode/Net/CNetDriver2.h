@@ -12,7 +12,6 @@
 
 #pragma  once
 #include "Singleton.h"
-#include "CMyStackWalker.h"
 
 #include "CSocketClient.h"
 #include "CSocketServer.h"
@@ -20,6 +19,7 @@
 #include "CNetAcceptThread.h"
 #include "NetCallBackFun.h"
 #include "PNLInnerNotic.h"
+#include "CMyStackWalker.h"
 
 enum
 {

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+
 #include "md5.h"
 
 std::string CMD5::MD5(char* pBuf, UINT nLength)

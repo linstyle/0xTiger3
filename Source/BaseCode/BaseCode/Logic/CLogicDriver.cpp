@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "CLogicDriver.h"
 #include "NetAPI.h"
 #include "CPacketFactory.h"

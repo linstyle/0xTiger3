@@ -4,11 +4,13 @@
 */
 
 #pragma once
-#include "GlobalType.h"
-/*
-	inet_addr宽字符版
-	来源网上
-*/
-#include <wchar.h>
+#pragma comment( lib, "ws2_32.lib"  )
 
+#include <wchar.h>
+#include <stdlib.h>
+
+//inet_addr宽字符版
 unsigned long inet_addr_w(const wchar_t *pSrcIP);
+
+//随机数
+int Random(double start, double end);

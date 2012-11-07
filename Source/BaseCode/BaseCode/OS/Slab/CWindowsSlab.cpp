@@ -1,9 +1,16 @@
+
+#include "CMyStackWalker.h"
 #include "CWindowsSlab.h"
 #include <stdio.h>
 #include <assert.h>
 CSlabCache::CSlabCache()
 {
 	m_pPage = NULL;
+}
+
+CSlabCache::~CSlabCache()
+{
+	SAFE_FREE(m_pPage);
 }
 
 /*
@@ -21,7 +28,7 @@ CSlabPartial::~CSlabPartial()
 
 	while ( NULL!= (pPage=PopPageHead()) )
 	{
-		free(pPage);
+		SAFE_FREE(pPage);
 	}
 }
 
@@ -70,8 +77,17 @@ VIR_PAGE_HEAD* CSlabPartial::__PopPageHead()
 
 void CSlabPartial::__PushPageHead(VIR_PAGE_HEAD* p)
 {	
+	IFm( NULL==p)
+	{
+		return;
+	}
+
 	++m_nPartialListCount;
 	list_add(&p->m_PageListNode,  &m_PartialList);
+}
+CKmem::CKmem()
+{
+	m_pSlabCache = 0;
 }
 
 CKmem::~CKmem()
@@ -122,84 +138,108 @@ void CKmem::InitD()
 
 void CKmem::TraceMe()
 {
-	printf("m_nSingleObjectSizeByte:%d, m_nPageSizeKB:%d, m_nMaxCountObject:%d\n",
-				m_nSingleObjectSizeByte, m_nSinglePageSizeKB, m_nSingleMaxCountObject);
-	printf("MallocCount:%d, FreeCount:%d,Malloc Elapse Memery(MB):%f\n", m_nDMallocCount, m_nDFreeCount,
+	LOGMN("m_nSingleObjectSizeByte:%d, m_nSinglePageSizeKB:%d, m_nSingleMaxCountObject:%d\n",
+			   m_nSingleObjectSizeByte, m_nSinglePageSizeKB, m_nSingleMaxCountObject);
+	LOGMN("MallocCount:%d, FreeCount:%d,Malloc Elapse Memery(MB):%f\n", m_nDMallocCount, m_nDFreeCount,
 		  m_nDMallocCount*m_nSingleObjectSizeByte/1024.0/1024.0);
-	printf("PartialMallocCount:%d, PartialFreeCount:%d\n", m_nDPartialMallocCount, m_nDPartialFreeCount);
-	printf("PartialCount:%d\n", m_SlabPartial.GetPartialCount());
-	printf("-----------------------------\n");
+	LOGMN("PartialMallocCount:%d, PartialFreeCount:%d\n", m_nDPartialMallocCount, m_nDPartialFreeCount);
+	LOGMN("PartialCount:%d\n", m_SlabPartial.GetPartialCount());
+	LOGMN("-----------------------------\n");
 }
 
 void* CKmem::Kmalloc()
 {
-	m_FastLock.Lock();
-
-	CSlabCache *s = GetCpuSlab();
-	if(NULL==s->m_pPage->m_pFreeList)
+	__try
 	{
-		assert(0==s->m_pPage->m_nFreeObject);
-		s->m_pPage->m_nState = STATE_ALL_USER_LOCK;
-		if(NULL==MallocPage(s))
+		m_FastLock.Lock();
+
+		CSlabCache *s = GetCpuSlab();
+		if(NULL==s->m_pPage->m_pFreeList)
 		{
-			m_FastLock.UnLock();
-			return NULL;
+			assert(0==s->m_pPage->m_nFreeObject);
+			s->m_pPage->m_nState = STATE_ALL_USER_LOCK;
+			if(NULL==MallocPage(s))
+			{
+				m_FastLock.UnLock();
+				return NULL;
+			}
 		}
+
+		void *p = s->m_pPage->m_pFreeList;
+		s->m_pPage->m_pFreeList = (void*)(*(long*)p);
+		--s->m_pPage->m_nFreeObject;
+
+		++m_nDMallocCount;
+
+		m_FastLock.UnLock();
+
+		return p;
 	}
-
-	void *p = s->m_pPage->m_pFreeList;
-	s->m_pPage->m_pFreeList = (void*)(*(long*)p);
-	--s->m_pPage->m_nFreeObject;
-	
-	++m_nDMallocCount;
-
-	m_FastLock.UnLock();
-
-	return p;
+	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
+	{
+		return NULL;
+	}
 }
 
 void  CKmem::Kfree(void *p)
 {
-	if( NULL==p )
+	IFm( NULL==p)
 	{
-		printf("Err, CKmem::KmemFree:NULL==p\n");
 		return;
 	}
 
-	/*
-		1.判断是否和当前页面相等，相等则释放
-		2.不相等，则计算是否其他slab
-		3.到pagehead,插入到邻居节点
-	*/
-	VIR_PAGE_HEAD* pPage = name_slab::OffsetPageHead(p);
-	if( NULL==pPage )
+	__try
 	{
-		printf("Err, CKmem::KmemFree:NULL==pPage\n");
-		return;
-	}
-
-	if( DEBUG_SLAB_FALGS & SLAB_RED_ZONE )
-	{		
-		if( name_slab::HEAD_BAD_ALIEN_MAGIC!=name_slab::OffsetBadMagic(p) )
+		if( NULL==p )
 		{
-			printf("Err, CKmem::FreeLocal:m_nBadAlienMagic\n");
+			printf("Err, CKmem::KmemFree:NULL==p\n");
 			return;
 		}
+
+		/*
+			1.判断是否和当前页面相等，相等则释放
+			2.不相等，则计算是否其他slab
+			3.到pagehead,插入到邻居节点
+		*/
+		VIR_PAGE_HEAD* pPage = name_slab::OffsetPageHead(p);
+		if( NULL==pPage )
+		{
+			printf("Err, CKmem::KmemFree:NULL==pPage\n");
+			return;
+		}
+
+		if( DEBUG_SLAB_FALGS & SLAB_RED_ZONE )
+		{		
+			if( name_slab::HEAD_BAD_ALIEN_MAGIC!=name_slab::OffsetBadMagic(p) )
+			{
+				printf("Err, CKmem::FreeLocal:m_nBadAlienMagic\n");
+				return;
+			}
+		}
+
+		m_FastLock.Lock();
+
+		if(false==FreeNode(pPage,p))
+		{
+			//失败++
+		}
+		
+		++m_nDFreeCount;
+		m_FastLock.UnLock();
 	}
-
-	m_FastLock.Lock();
-
-	if(false==FreeNode(pPage,p))
+	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
 	{
-		//失败++
+		
 	}
-	
-	++m_nDFreeCount;
-	m_FastLock.UnLock();
 }
 
 bool CKmem::FreeNode(VIR_PAGE_HEAD* pPage,void *p)
 {
+	IFm(NULL==pPage || NULL==p)
+	{
+		return false;
+	}
+
 	++pPage->m_nFreeObject;
 
 	//说明不在当前slab中
@@ -217,6 +257,11 @@ bool CKmem::FreeNode(VIR_PAGE_HEAD* pPage,void *p)
 
 bool CKmem::FreePartialNode(VIR_PAGE_HEAD* pPage, void *p)
 {
+	IFm(NULL==pPage || NULL==p)
+	{
+		return false;
+	}
+
 	void *pPrior = pPage->m_pFreeList;
 
 	*(long*)p = (long)pPage->m_pFreeList;
@@ -240,6 +285,12 @@ bool CKmem::FreePartialNode(VIR_PAGE_HEAD* pPage, void *p)
 
 void CKmem::FreeOSPage(VIR_PAGE_HEAD* pPage)
 {
+	IFm(NULL==pPage)
+	{
+		return;
+	}
+
+
 	if( !(DEBUG_SLAB_FALGS & SLAB_GC_PARTIAL) )
 	{
 		return;
@@ -249,13 +300,17 @@ void CKmem::FreeOSPage(VIR_PAGE_HEAD* pPage)
 		&& m_SlabPartial.GetPartialCount() >= name_slab::FREE_KEEP_PARTIAL )
 	{
 		m_SlabPartial.PopPageHead(pPage);
-		free(pPage);
+		SAFE_FREE(pPage);
 	}
 	
 }
 
 void* CKmem::MallocPage(CSlabCache *s)
 {
+	IFm(NULL==s)
+	{
+		return NULL;
+	}
 	/*
 		1.如果为空，则寻找邻居节点
 					如果邻居节点为空，申请内存
@@ -267,14 +322,17 @@ void* CKmem::MallocPage(CSlabCache *s)
 	if( NULL==pPage )
 	{
 		pPage=MallocOSPage();
-		if( NULL==pPage )			
+		IFm( NULL==pPage )			
 		{
-			printf("Err, CKmem::MallocPage NULL==MallocOSPage.......\n");
 			return NULL;
 		}
 	}
 
-	assert(STATE_ALL_USER_LOCK != pPage->m_nState);
+	IFm(STATE_CACHE_LOCK != pPage->m_nState)
+	{
+		return NULL;
+	}
+
 	pPage->m_nState = STATE_CACHE_LOCK;
 
 	s->m_pPage = pPage;
@@ -290,7 +348,11 @@ VIR_PAGE_HEAD* CKmem::MallocPartialNode()
 		return NULL;
 	}
 	
-	assert(STATE_PARTIAL_LOCK==pPage->m_nState);
+	IFm(STATE_PARTIAL_LOCK==pPage->m_nState)
+	{
+		return NULL;
+	}
+
 	++m_nDPartialMallocCount;
 	return pPage;
 }
@@ -298,7 +360,7 @@ VIR_PAGE_HEAD* CKmem::MallocPartialNode()
 VIR_PAGE_HEAD* CKmem::MallocOSPage()
 {
 	void *p = malloc(m_nSinglePageSizeKB*1024);
-	if (NULL==p)
+	IFm(NULL==p)
 	{
 		return NULL;
 	}
@@ -310,6 +372,11 @@ VIR_PAGE_HEAD* CKmem::MallocOSPage()
 
 void CKmem::InitNewOSPage(void *p)
 {
+	IFm(NULL==p)
+	{
+		return;
+	}
+
 	//先拆出一个头
 	VIR_PAGE_HEAD *pPage = (VIR_PAGE_HEAD*)p;
 
@@ -319,6 +386,11 @@ void CKmem::InitNewOSPage(void *p)
 
 void CKmem::InitMemeryOSPage(VIR_PAGE_HEAD *pPage)
 {
+	IFm(NULL==pPage)
+	{
+		return;
+	}
+
 	void *p = pPage->m_pFreeList;
 
 	for (int i=0; i<m_nSingleMaxCountObject; ++i)
@@ -366,88 +438,14 @@ CSlabCache *CKmem::GetCpuSlab()
 
 CSlabCache *CKmem::GetCpuSlab(int nIndex)
 {
-	assert(nIndex<m_nCPUNumberOf || nIndex<0);
+	IFm(nIndex<m_nCPUNumberOf || nIndex<0)
+	{
+		return NULL;
+	}
+
 	if (nIndex>m_nCPUNumberOf || nIndex<0)
 	{
 		return NULL;
 	}
 	return &m_pSlabCache[nIndex];
-}
-
-namespace name_slab
-{
-	CKmem Kmem[sizeof(KmemMallocByte)/sizeof(*KmemMallocByte)];
-}
-
-void name_slab::kmem_init()
-{
-	int nKmemCount = sizeof(name_slab::KmemMallocByte)/sizeof(*name_slab::KmemMallocByte);
-
-	for (int i=0; i<nKmemCount; ++i)
-	{
-		name_slab::Kmem[i].Init(name_slab::KmemMallocByte[i]);
-	}
-}
-
-void* name_slab::kmem_malloc(int nSizeByte)
-{
-	int nIndex = kmem_index(nSizeByte);
-	if(-1==nIndex)
-	{
-		return NULL;
-	}
-
-	CKmem *pKmem = &Kmem[nIndex];
-	if (NULL==pKmem)
-	{
-		return NULL;
-	}
-
-	return pKmem->Kmalloc();
-}
-
-void name_slab::kmem_free(void *p)
-{
-	VIR_PAGE_HEAD *pPage = OffsetPageHead(p);
-	if (NULL==pPage)
-	{
-		printf("Err, name_slab::kmem_free,NULL==pPage\n");
-		return;
-	}
-
-	CKmem *pKmem = pPage->m_pKmem;
-	if(NULL==pKmem)
-	{
-		printf("Err, name_slab::kmem_free,NULL==pKmem\n");
-		return ;
-	}
-
-	pKmem->Kfree(p);
-}
-
-int name_slab::kmem_index(int nSizeByte)
-{
-	int nKmemCount = sizeof(name_slab::KmemMallocByte)/sizeof(*name_slab::KmemMallocByte);
-
-	for (int i=0; i<nKmemCount; ++i)
-	{
-		if (KmemMallocByte[i]>=nSizeByte)
-		{
-			return i;
-		}
-	}
-	
-	return -1;
-}
-
-void name_slab::kemem_traceme()
-{
-	int nKmemCount = sizeof(name_slab::KmemMallocByte)/sizeof(*name_slab::KmemMallocByte);
-
-	printf("		Kmem TraceMe:\n");
-	for (int i=0; i<nKmemCount; ++i)
-	{
-		printf("KmemID:%d\n", i);
-		name_slab::Kmem[i].TraceMe();
-	}
 }

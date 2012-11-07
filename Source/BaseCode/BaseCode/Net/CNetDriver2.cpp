@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "CNetDriver2.h"
 #include <process.h>
 initialiseSingleton(CNetDriver2);

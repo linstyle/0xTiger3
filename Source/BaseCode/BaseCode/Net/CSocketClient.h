@@ -4,7 +4,7 @@
 	@重写下网络代码之，网络客户端对象
 */
 #pragma  once
-
+#include <winsock2.h>
 #include "LinuxList.h"
 #include "CWindowsSlabManager.h"
 #include "CCircleBuffer.h"

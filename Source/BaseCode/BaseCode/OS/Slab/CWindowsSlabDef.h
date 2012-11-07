@@ -2,14 +2,6 @@
 
 //lindp
 //2010.7.17 2:51
-/*
-	一些函数可以挪到公共库里
-	可能有人喜欢把namespace name_slab中的函数另建一个类什么的，可我还是喜欢这种
-	命名空间+全局函数的C风格。
-*/
-const unsigned int __ALIGN_SIZE_LONG = sizeof(long);	
-const unsigned int __ALIGN_SIZE_PAGE = 4;     //这个应该有API得到吧？
-#define _ALIGN(a,size) (((a)+(size)-1)&(~((size)-1)))
 
 /*
 	CONFIG_SLAB_DEBUG	:总开关
@@ -35,8 +27,8 @@ const unsigned int __ALIGN_SIZE_PAGE = 4;     //这个应该有API得到吧？
 	0x100,0x200,0x300,0x400
 	...
 */
-#define SLAB_RED_ZONE 0x1			//0x1	开启坏区检测
-#define SLAB_CPU_RUN_ID 0x2			//0x2	开启多核CPU缓存,即尽量保证切换时，在使用上不会出现脏的页面需要重刷
+#define SLAB_RED_ZONE 0x0			//0x1	开启坏区检测
+#define SLAB_CPU_RUN_ID 0x0		//0x2	开启多核CPU缓存,即尽量保证切换时，在使用上不会出现脏的页面需要重刷
 #define SLAB_GC_PARTIAL 0x0			//0x4	开启多余页面回收
 
 //  |red|haed address|[list]content|
@@ -48,7 +40,7 @@ namespace name_slab
 {
 	//kmem分配对象的大小,单位byte.最小4byte,需要的话可以在这里添加。
 	const int KmemMallocByte[]=
-	{4, 8, 16, 32, 64, 128, 512, 1024, 2048, 4096};
+	{8,16,32,64,128,512,1024, 2048,8192,16384,32768};
 
 	//坏区检测的魔术数字
 	const unsigned long HEAD_BAD_ALIEN_MAGIC = 0x01020304;

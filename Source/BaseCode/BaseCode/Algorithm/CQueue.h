@@ -12,7 +12,6 @@
 #pragma once
 
 #include <stdio.h>
-#include "GlobalType.h"
 #include "CLock.h"
 #include "LinuxList.h"
 

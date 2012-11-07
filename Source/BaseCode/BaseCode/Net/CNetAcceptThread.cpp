@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "CNetAcceptThread.h"
 #include "CSocketAPI.h"
 #include <process.h>

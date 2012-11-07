@@ -4,7 +4,6 @@
 */
 
 #pragma once
-#include "GlobalType.h"
 #include  <conio.h>
 
 

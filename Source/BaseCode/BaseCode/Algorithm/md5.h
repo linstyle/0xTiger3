@@ -11,11 +11,11 @@
 *********************************************************************/
 #pragma once
 
-#include "GlobalType.h"
 #include <Windows.h>
 #include <assert.h>
 #include <string>
 
+typedef unsigned __int32 U32;
 
 static const U32 MD5_SIZE = 16;
 

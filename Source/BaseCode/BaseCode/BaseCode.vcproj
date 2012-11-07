@@ -91,6 +91,79 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\BaseCode;OS;OS\slab;Algorithm;Exception;GlobalType;Guid;Init;Log;Logic;LogicPlayer;Msg;Net;Network;ObjectMapManager"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -141,79 +214,6 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="3"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\;Algorithm\;Exception\;GlobalType\;Guid\;Init\;Log\;Logic\;LogicPlayer\;Msg\;Net\;Network\;ObjectMapManager\;OS\Lock\;OS\Other;OS\Slab2;OS\Thread;OS\Time"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -337,7 +337,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -345,7 +345,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|x64"
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -418,10 +418,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Algorithm\CRand.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Algorithm\CSingleBuffer.cpp"
 				>
 			</File>
@@ -478,7 +474,7 @@
 			Name="GlobalType"
 			>
 			<File
-				RelativePath=".\GlobalType\GameEnum.h"
+				RelativePath=".\GlobalType\GlobalEnum.h"
 				>
 			</File>
 			<File
@@ -490,11 +486,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GlobalType\GlobalType.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GlobalType\ServerEnum.h"
+				RelativePath=".\GlobalType\GlobalMacro.h"
 				>
 			</File>
 		</Filter>
@@ -522,14 +514,6 @@
 			Name="Log"
 			>
 			<File
-				RelativePath=".\Log\CLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Log\CLog.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Log\CLog2.0.cpp"
 				>
 			</File>
@@ -537,66 +521,14 @@
 				RelativePath=".\Log\CLog2.0.h"
 				>
 			</File>
-			<File
-				RelativePath=".\Log\CLogManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Log\CLogManager.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Logic"
 			>
-			<File
-				RelativePath=".\Logic\CLogicDriver.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CLogicDriver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CNetTaskQueue.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CNetTaskQueue.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CNetTransToLogic.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CNetTransToLogic.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CommonStruct.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CThreadQuit.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Logic\CThreadQuit.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="LogicPlayer"
 			>
-			<File
-				RelativePath=".\LogicPlayer\CBaseLogicPlayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LogicPlayer\CBaseLogicPlayer.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Net"
@@ -626,6 +558,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Net\CSocketAPI.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Net\CSocketAPI.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Net\CSocketClient.cpp"
 				>
 			</File>
@@ -642,14 +582,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Net\NetAPI.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Net\NetAPI.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Net\NetCallBackFun.cpp"
 				>
 			</File>
@@ -657,115 +589,79 @@
 				RelativePath=".\Net\NetCallBackFun.h"
 				>
 			</File>
+			<Filter
+				Name="include"
+				>
+				<File
+					RelativePath=".\Net\NetAPI.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Net\NetAPI.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="ObjectMapManager"
 			>
-			<File
-				RelativePath=".\ObjectMapManager\CObjectMapManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ObjectMapManager\CObjectMapManager.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="OS"
 			>
+			<File
+				RelativePath=".\OS\CLock.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OS\CLock.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OS\CTime.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OS\CTime.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OS\CTimer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OS\CTimer.h"
+				>
+			</File>
 			<Filter
-				Name="Lock"
+				Name="slab"
 				>
 				<File
-					RelativePath=".\OS\Lock\CLock.cpp"
+					RelativePath=".\OS\slab\CVirPageHead.h"
 					>
 				</File>
 				<File
-					RelativePath=".\OS\Lock\CLock.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Other"
-				>
-				<File
-					RelativePath=".\OS\Other\OSOther.cpp"
+					RelativePath=".\OS\slab\CWindowsSlab.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\OS\Other\OSOther.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Slab2"
-				>
-				<File
-					RelativePath=".\OS\Slab2\CVirPageHead.h"
+					RelativePath=".\OS\slab\CWindowsSlab.h"
 					>
 				</File>
 				<File
-					RelativePath=".\OS\Slab2\CWindowsSlab.cpp"
+					RelativePath=".\OS\slab\CWindowsSlabDef.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\OS\Slab2\CWindowsSlab.h"
+					RelativePath=".\OS\slab\CWindowsSlabDef.h"
 					>
 				</File>
 				<File
-					RelativePath=".\OS\Slab2\CWindowsSlabDef.cpp"
+					RelativePath=".\OS\slab\CWindowsSlabManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\OS\Slab2\CWindowsSlabDef.h"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Slab2\CWindowsSlabManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Slab2\CWindowsSlabManager.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Thread"
-				>
-				<File
-					RelativePath=".\OS\Thread\CThread.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Thread\CThread.h"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Thread\CThreadPool.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Thread\CThreadPool.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Time"
-				>
-				<File
-					RelativePath=".\OS\Time\CTime.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Time\CTime.h"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Time\CTimer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\OS\Time\CTimer.h"
+					RelativePath=".\OS\slab\CWindowsSlabManager.h"
 					>
 				</File>
 			</Filter>
@@ -782,10 +678,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Msg\DemoPFileTrans.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Msg\IPackets.cpp"
 				>
 			</File>
@@ -794,35 +686,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Msg\PHelloWorld.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Msg\PHelloWorld.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Msg\PLogin.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Msg\PLogin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Msg\PLoginGateWay.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Msg\PLoginGateWay.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Msg\PNLInnerNotic.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Msg\PNLInnerNotic.h"
 				>
 			</File>
 		</Filter>

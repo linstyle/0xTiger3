@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+
 #include "CQueue.h"
 
 CQueue::~CQueue()

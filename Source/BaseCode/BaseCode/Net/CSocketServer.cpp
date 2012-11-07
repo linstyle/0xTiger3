@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "CSocketServer.h"
+#include "GlobalMacro.h"
 
 void CSocketServer::Init()
 {

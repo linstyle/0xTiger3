@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "CNetKernelThread.h"
 #include "NetCallBackFun.h"
 #include <process.h>

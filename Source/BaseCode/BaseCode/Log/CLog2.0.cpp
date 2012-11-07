@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+
 #include "CLog2.0.h"
 #include <windows.h>
 #include <process.h>

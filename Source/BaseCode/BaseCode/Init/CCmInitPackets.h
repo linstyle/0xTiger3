@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "GlobalType.h"
 #include "Singleton.h"
 
 #include "PNLInnerNotic.h"

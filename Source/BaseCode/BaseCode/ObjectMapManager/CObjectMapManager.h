@@ -13,9 +13,9 @@
    这样不依赖具体的套接字连接查询
 */
 #include "Singleton.h"
+#include "CBaseLogicPlayer.h"
 #include "CMyStackWalker.h"
 #include "IPackets.h"
-#include "CBaseLogicPlayer.h"
 #include <map>
 
 using namespace std;
@@ -75,7 +75,7 @@ public:
 	void CloseByUser(INT64 nUserID);
 
 	//提权
-	bool ChangeIdent(INT64 nUserID, IDENT nIdent);
+	bool ChangeIdent(INT64 nUserID, name_objectmap::IDENT nIdent);
 	
 	/*
 		方便使用，也可以抽象出一些高级接口

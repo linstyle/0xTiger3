@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "CMGuid.h"
 
 initialiseSingleton(CMGuid);

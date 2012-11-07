@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "PLogin.h"
 #include "CObjectMapManager.h"
 

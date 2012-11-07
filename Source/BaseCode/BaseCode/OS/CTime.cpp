@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "CTime.h"
 
 unsigned long CTime::GetYYMMDDHHMM()

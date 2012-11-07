@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+
 #include "CSingleBuffer.h"
 
 CSingleBuffer::CSingleBuffer()

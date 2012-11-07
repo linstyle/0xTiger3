@@ -1,5 +1,7 @@
+
 #include "CWindowsSlabDef.h"
 #include "CVirPageHead.h"
+#include "GlobalMacro.h"
 using namespace name_slab;
 
 long name_slab::CalcSingleObjectHeadSize()
@@ -48,8 +50,9 @@ unsigned int name_slab::OffsetBadMagic(void *p)
 //∑√Œ µ±«∞CPUID
 int name_slab::GetCPURunId()
 {
-	_asm {mov eax, 1} 
-	_asm {cpuid} 
-	_asm {shr ebx, 24} 
-	_asm {mov eax, ebx} 
+	return 0;
+	//_asm {mov eax, 1} 
+	//_asm {cpuid} 
+	//_asm {shr ebx, 24} 
+	//_asm {mov eax, ebx} 
 }

@@ -1,18 +1,22 @@
-#include "stdafx.h"
+
 #include "CSocketClient.h"
 #include "CWindowsSlabManager.h"
 #include "CSocketAPI.h"
-
+#include "GlobalMacro.h"
 CSocketClient*  MallocSocketClientObject()
 {
-	void *p = name_slab::kmem_malloc(sizeof(CSocketClient));	
+	//void *p = name_slab::kmem_malloc(sizeof(CSocketClient));	
 
-	IFn( NULL==p )
-	{
-		return NULL;
-	}
+	//IFn( NULL==p )
+	//{
+	//	return NULL;
+	//}
 
-	CSocketClient *pSocketClient = new(p)CSocketClient;
+	//CSocketClient *pSocketClient = new(p)CSocketClient;
+
+	//return pSocketClient;
+
+	CSocketClient *pSocketClient = new CSocketClient;
 
 	return pSocketClient;
 }
@@ -20,13 +24,14 @@ void  FreeSocketClientObject(CSocketClient* p)
 {
 	//根据C++对象原则，主动调用析构函数
 	//printf("CSocketRun::FreeNetObject, %x\n", p);
-	IFn(NULL==p)
-	{
-		return;
-	}
-	p->~CSocketClient();
+	//IFn(NULL==p)
+	//{
+	//	return;
+	//}
+	//p->~CSocketClient();
 
-	name_slab::kmem_free((void*)p);
+	//name_slab::kmem_free((void*)p);
+	SAFE_DELETE(p);
 }
 
 CSocketClient::CSocketClient()

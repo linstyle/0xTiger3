@@ -10,10 +10,10 @@
 */
 
 #pragma  once
-#include "GlobalType.h"
-#include "GameEnum.h"
-#include "Singleton.h"
 
+#include "GlobalEnum.h"
+#include "Singleton.h"
+#include "GlobalMacro.h"
 /*
 	GUID 共8个字节，64位。划分如下：
 	0  -11bit :服务器区号,		12bit, 支持 0-4096。

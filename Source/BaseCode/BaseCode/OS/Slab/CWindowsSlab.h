@@ -1,11 +1,12 @@
 #pragma once
 //lindp
 //2011.7.17
+#include "GlobalMacro.h"
 #include "CLock.h"
 #include "LinuxList.h"
 #include "CVirPageHead.h"
 #include "CWindowsSlabDef.h"
-
+#include "CLog2.0.h"
 
 /*
 	Slab缓冲页面，跟CPU挂钩
@@ -14,6 +15,7 @@ class CSlabCache
 {
 public:
 	CSlabCache();
+	~CSlabCache();
 
 private:
 
@@ -63,6 +65,7 @@ private:
 class CKmem
 {
 public:
+	CKmem();
 	~CKmem();
 
 	void Init(long nMallocObjectSizeByte);
@@ -128,15 +131,4 @@ private:
 	long m_nSingleObjectSizeByte;
 	long m_nSinglePageSizeKB;	
 	long m_nSingleMaxCountObject;
-};
-
-namespace name_slab
-{
-	int kmem_index(int nSizeByte);
-
-	//对外接口
-	void kmem_init();
-	void* kmem_malloc(int nSizeByte);
-	void kmem_free(void *p);
-	void kemem_traceme();
 };

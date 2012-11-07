@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "NetCallBackFun.h"
 #include "PNLInnerNotic.h"
 

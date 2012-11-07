@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "IPackets.h"
 #include "MTASSERT.h"
 IPackHead::IPackHead(PACKET_DEFINE1 nPacketDefine1, int nPacketSize)

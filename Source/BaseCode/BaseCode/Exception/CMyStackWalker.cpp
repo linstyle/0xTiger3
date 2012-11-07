@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "CMyStackWalker.h"
 
 LONG WINAPI ExpFilter(EXCEPTION_POINTERS* pExp, DWORD dwExpCode)
