@@ -62,8 +62,8 @@ private:
 public:
 
 private:
-	volatile bool m_bThreadRun;
 	HANDLE m_hThreadLoop;
+	volatile bool m_bThreadRun;	
 	unsigned int   m_uThreadLoop;
 	
 	CIOCP m_IOCP;

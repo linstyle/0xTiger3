@@ -12,6 +12,11 @@ bool net::AddClientSocket(const char* pConnectIP, USHORT nConnectPort)
 	return g_NetDriver2.AddClientSocket(pConnectIP, nConnectPort);
 }
 
+void net::Init()
+{
+	return g_NetDriver2.Init();
+}
+
 int net::GetPacketStream(char *pBuffer, int nBufferLen)
 {
 	return g_NetDriver2.GetPacketStream(pBuffer, nBufferLen);

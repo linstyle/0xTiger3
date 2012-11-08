@@ -137,6 +137,8 @@ unsigned int WINAPI CNetAcceptThread::ThreadAccept(void* pParam)
 			FreeSocketClientObject(pSocketClient);
 			pSocketClient = NULL;
 		}
+
+		pSocketClient = NULL;
 			
 	}//end while
 

@@ -167,7 +167,7 @@ int CSocketClient::RecvPacketStream()
 
 int CSocketClient::Connect()
 {
-	if(false==InitConnect())
+	IFn(false==InitConnect())
 	{
 		return -1;
 	}

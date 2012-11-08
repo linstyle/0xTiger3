@@ -64,11 +64,12 @@ private:
 		@send,recv,connectº¯Êý
 	*/
 	bool InitConnect();
-	int FlushSendSub();
-	int RecvPacketStream();
+	int  FlushSendSub();
+
 	void InitRecv();
 	void InitRecv1();
 	void InitRecv2();
+	int  RecvPacketStream();
 
 public:
 	SOCKET m_nSocket;

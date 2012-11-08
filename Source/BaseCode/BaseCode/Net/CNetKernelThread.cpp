@@ -1,5 +1,6 @@
 #include "CNetKernelThread.h"
 #include "NetCallBackFun.h"
+#include "GlobalMacro.h"
 #include <process.h>
 
 CNetKernelThread::CNetKernelThread()

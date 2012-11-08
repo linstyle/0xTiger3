@@ -45,7 +45,6 @@ bool CNetDriver2::AddClientSocket(const char* pConnectIP, USHORT nConnectPort)
 	}
 
 	m_bHasInit = true;
-
 	return true;
 }
 

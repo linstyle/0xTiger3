@@ -10,6 +10,7 @@ namespace net
 {
 	bool SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);	
 	bool AddClientSocket(const char* pConnectIP, USHORT nConnectPort);
+	void Init();
 
 	int GetPacketStream(char *pBuffer, int nBufferLen);
 	int PutPacketStream(const char *pBuffer, int nBufferLen);
