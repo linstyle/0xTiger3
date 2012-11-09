@@ -7,7 +7,7 @@ bool net::SetSocketServer(const char* pName, const char* pListenIP, USHORT nList
 	return g_NetDriver2.SetSocketServer(pName, pListenIP, nListenPort);
 }
 
-bool net::AddClientSocket(const char* pConnectIP, USHORT nConnectPort)
+bool net::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 {
 	return g_NetDriver2.AddClientSocket(pConnectIP, nConnectPort);
 }

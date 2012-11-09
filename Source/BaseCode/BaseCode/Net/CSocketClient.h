@@ -45,7 +45,7 @@ namespace socket_circle_config
 	const int SEND_CIRCLE_LEN = 16*1024; //kb，跟具体业务有关
 };
 
-
+static unsigned int SOCKET_KEY_SEED;
 class CSocketClient
 {
 public:
@@ -59,6 +59,7 @@ public:
 	int Send(const char* pBuffer, int nBufferLen);
 	int FlushSend();
 
+	unsigned int GetKey();
 private:
 	/*
 		@send,recv,connect函数
@@ -100,6 +101,9 @@ public:
 		2:需要重连
 	*/
 	IOCP_STEP_FLAG m_nStepFlag;
+
+	//传递给逻辑层的key,直接用地址的话，因为是异步的，怕重复
+	unsigned int m_nKey;
 
 	struct list_head m_List;
 private:

@@ -18,6 +18,8 @@ void CNetAcceptThread::Init(CIOCP *pIOCP)
 	m_hThreadAccept = NULL;
 	m_uThreadAccept= 0;
 	m_pIOCP = pIOCP;
+
+	INITASSERT(!m_pIOCP);
 	
 	InitThread();
 }
@@ -85,7 +87,10 @@ bool CNetAcceptThread::InitAccpetExlpfn(CSocketServer *pSocketServer)
 
 bool CNetAcceptThread::IOCPPostConnect(CSocketClient *pSocketClient)
 {
-	IFn( FALSE==m_pIOCP->PostStatus((ULONG_PTR)pSocketClient, 1) )
+	IFn(!m_pIOCP)
+		return false;
+
+	IFn( m_pIOCP && FALSE==m_pIOCP->PostStatus((ULONG_PTR)pSocketClient, 1) )
 	{
 		return false;
 	}	

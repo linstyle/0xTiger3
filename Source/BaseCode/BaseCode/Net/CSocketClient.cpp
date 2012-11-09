@@ -1,8 +1,10 @@
-
 #include "CSocketClient.h"
 #include "CWindowsSlabManager.h"
 #include "CSocketAPI.h"
 #include "GlobalMacro.h"
+
+SOCKET_KEY_SEED = 0;
+
 CSocketClient*  MallocSocketClientObject()
 {
 	//void *p = name_slab::kmem_malloc(sizeof(CSocketClient));	
@@ -17,7 +19,11 @@ CSocketClient*  MallocSocketClientObject()
 	//return pSocketClient;
 
 	CSocketClient *pSocketClient = new CSocketClient;
-
+	
+	if (pSocketClient)
+	{
+		pSocketClient->m_nKey = SOCKET_KEY_SEED++;
+	}
 	return pSocketClient;
 }
 void  FreeSocketClientObject(CSocketClient* p)
@@ -36,6 +42,7 @@ void  FreeSocketClientObject(CSocketClient* p)
 
 CSocketClient::CSocketClient()
 {
+	m_nKey = 0;
 	m_bAutoConnect = false;
 	Init();
 }
@@ -53,6 +60,11 @@ void CSocketClient::Init()
 	m_RecvBuffer.Init(socket_circle_config::RECV_CIRCLE_LEN);
 	m_SendBuffer.Init(socket_circle_config::SEND_CIRCLE_LEN);
 	INIT_LIST_HEAD(&m_List);
+}
+
+unsigned int CSocketClient::GetKey()
+{
+	return m_nKey;
 }
 
 int CSocketClient::Send(const char* pBuffer, int nBufferLen)

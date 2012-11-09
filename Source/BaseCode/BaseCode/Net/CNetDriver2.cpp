@@ -29,7 +29,7 @@ bool CNetDriver2::SetSocketServer(const char* pName, const char* pListenIP, USHO
 	return true;
 }
 
-bool CNetDriver2::AddClientSocket(const char* pConnectIP, USHORT nConnectPort)
+bool CNetDriver2::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 {
 	IFn(!pConnectIP)
 		return false;

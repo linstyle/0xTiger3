@@ -10,6 +10,7 @@
 #include "CMyStackWalker.h"
 #include "MTASSERT.h"
 #include <map>
+#include <vector>
 
 using namespace std;
 
@@ -24,7 +25,7 @@ public:
 	*/
 	void Init();
 
-	bool AddClientSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
+	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
 
 	CIOCP* GetIOCP();
 
@@ -35,30 +36,25 @@ private:
 
 	void InitThread();
 	void ReleaseThread();
-	
+
+
 	void Loop();
 	void LoopIOCP();
 	bool _LoopIOCP();
-	void LoopListSocketClient();
-	void LoopBridgeQueue();
 
-	void AddToClientSocketList(CSocketClient *pSocketClient);
-	void DelFromClientSocketList(CSocketClient *pSocketClient);
-
-	//DoSocketClientErr,逻辑层回调的通知，不需要NoticLogic
-	void DoSocketClientErr(CSocketClient *pSocketClient);
-	void DoSocketClientErrAndNoticLogic(CSocketClient *pSocketClient); 
-	void DoSocketClientRecv(CSocketClient *pSocketClient);
-	void DoSocketClientConnect(CSocketClient *pSocketClient);
-	void DoSocketClientAccept(CSocketClient *pSocketClient);
-	void DoBridgeQueue(const char *pBuffer);
-	void DoBridgeNLInnerNotic(PNLInnerNotic *pNLInnerNotic); //处理内部(logic->net)协议
-
-	//投递一个WSARECV
-	void PostIOCPRecv(CSocketClient *pSocketClient);
-
-	//检测CSocketClient是否有效
-	bool VerifySocketClientValid(CSocketClient *pSocketClient);
+	void SendAllData();
+	void OnRecvData();
+	
+	void Connect();
+	/*
+		AddAcceptSocket
+		添加一个连接进来的套接字对象
+			
+		CloseClientSocket
+		关闭一个套接字对象对象
+	*/
+	bool AddAcceptSocket(CSocketClient *pSocketClient);
+	void CloseClientSocket(CSocketClient *pSocketClient);
 public:
 
 private:
@@ -75,6 +71,74 @@ private:
 		现在SocketClient的hash表，当逻辑层传错误包时，网络层可能已经删除这个对象，
 		故要先检测是否存在该值
 	*/
-	typedef map<CSocketClient *,CSocketClient *> HASH_SOCKETCLIENT;
+	typedef map<unsigned int,CSocketClient *> HASH_SOCKETCLIENT;
 	HASH_SOCKETCLIENT m_HashSocketClient;
+
+	vector<CSocketClient*> m_vConnect;
 };
+
+//class CNetKernelThread
+//{
+//public:
+//	CNetKernelThread();
+//	~CNetKernelThread();
+//
+//	/*
+//		AddClientSocket,Init()顺序要注意，AddClientSocket要在Init()之前，暂时不支持动态添加
+//	*/
+//	void Init();
+//
+//	bool AddClientSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
+//
+//	CIOCP* GetIOCP();
+//
+//private:
+//	static unsigned int WINAPI ThreadLoop(void* pParam);
+//
+//	void Release();
+//
+//	void InitThread();
+//	void ReleaseThread();
+//	
+//	void Loop();
+//	void LoopIOCP();
+//	bool _LoopIOCP();
+//	void LoopListSocketClient();
+//	void LoopBridgeQueue();
+//
+//	void AddToClientSocketList(CSocketClient *pSocketClient);
+//	void DelFromClientSocketList(CSocketClient *pSocketClient);
+//
+//	//DoSocketClientErr,逻辑层回调的通知，不需要NoticLogic
+//	void DoSocketClientErr(CSocketClient *pSocketClient);
+//	void DoSocketClientErrAndNoticLogic(CSocketClient *pSocketClient); 
+//	void DoSocketClientRecv(CSocketClient *pSocketClient);
+//	void DoSocketClientConnect(CSocketClient *pSocketClient);
+//	void DoSocketClientAccept(CSocketClient *pSocketClient);
+//	void DoBridgeQueue(const char *pBuffer);
+//	void DoBridgeNLInnerNotic(PNLInnerNotic *pNLInnerNotic); //处理内部(logic->net)协议
+//
+//	//投递一个WSARECV
+//	void PostIOCPRecv(CSocketClient *pSocketClient);
+//
+//	//检测CSocketClient是否有效
+//	bool VerifySocketClientValid(CSocketClient *pSocketClient);
+//public:
+//
+//private:
+//	HANDLE m_hThreadLoop;
+//	volatile bool m_bThreadRun;	
+//	unsigned int   m_uThreadLoop;
+//	
+//	CIOCP m_IOCP;
+//
+//	//管理所有连接的链表
+//	CList m_ListSocketClient;
+//
+//	/*
+//		现在SocketClient的hash表，当逻辑层传错误包时，网络层可能已经删除这个对象，
+//		故要先检测是否存在该值
+//	*/
+//	typedef map<CSocketClient *,CSocketClient *> HASH_SOCKETCLIENT;
+//	HASH_SOCKETCLIENT m_HashSocketClient;
+//};
