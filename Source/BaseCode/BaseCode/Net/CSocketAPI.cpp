@@ -256,3 +256,8 @@ int CSocketAPI::SendnUDP(SOCKET fd, const char* pSendBuffer, int nSendLen, int n
 	
 	return nResult;
 }
+
+int CSocketAPI::Close(SOCKET fd)
+{
+	return closesocket(fd);
+}

@@ -30,14 +30,6 @@ enum IOCP_EVENT_TYPE
 	IOCP_DEBUG_FREE
 };
 
-enum IOCP_STEP_FLAG
-{
-	IOCP_STEP_ERR,
-	IOCP_STEP_INIT,  //初始化状态
-	IOCP_STEP_RECV_ING,
-	IOCP_STEP_RECV_COMPLATE,
-	IOCP_STEP_CONNECT,
-};
 
 namespace socket_circle_config
 {
@@ -93,14 +85,6 @@ public:
 	IOCP_EVENT_TYPE m_nIOCPEvent;
 	CCircleBuffer m_RecvBuffer;
 	CCircleBuffer m_SendBuffer;
-	/*
-		表示当前需要处理的队列
-		-1:表示出错
-		0:在recv投递中
-		1:投递完成
-		2:需要重连
-	*/
-	IOCP_STEP_FLAG m_nStepFlag;
 
 	//传递给逻辑层的key,直接用地址的话，因为是异步的，怕重复
 	unsigned int m_nKey;

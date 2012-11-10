@@ -37,6 +37,7 @@ public:
 	static int RecvnUDP(SOCKET fd, char* pRecvBuffer, int nRecvLen, int nRecvFlag, sockaddr* FromAddr);
 	static int SendnUDP(SOCKET fd, const char* pSendBuffer, int nSendLen, int nSendFlag, const struct sockaddr* SendAddr);
 
+	static bool Close(SOCKET fd);
 private:
 
 public:

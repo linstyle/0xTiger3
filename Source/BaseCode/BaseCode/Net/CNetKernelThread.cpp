@@ -51,6 +51,9 @@ CIOCP* CNetKernelThread::GetIOCP()
 
 bool CNetKernelThread::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect)
 {
+	IFn(!pConnectIP)
+		return false;
+
 	CSocketClient* pSocketClient = MallocSocketClientObject();
 	IFn(NULL==pSocketClient)
 	{
@@ -61,25 +64,18 @@ bool CNetKernelThread::AddConnectSocket(const char* pConnectIP, USHORT nConnectP
 	pSocketClient->m_bAutoConnect = bAutoConnect;
 	pSocketClient->m_nPort = nConnectPort;
 	pSocketClient->m_nIP = inet_addr(pConnectIP);
-	AddToClientSocketList(pSocketClient);
+	AddClientSocket(pSocketClient);
 	return true;
 }
 
-void CNetKernelThread::AddAcceptSocket(CSocketClient *pSocketClient)
+void CNetKernelThread::AddClientSocket(CSocketClient *pSocketClient)
 {
 	IFn(NULL==pSocketClient)
 	{
 		return;
 	}
 
-	IFn(VerifySocketClientValid(pSocketClient))
-	{
-		return;
-	}
-
 	m_ListSocketClient.Add(&pSocketClient->m_List);
-
-	//
 	m_HashSocketClient.insert(pair<pSocketClient->GetKey(), CSocketClient*>(pSocketClient,pSocketClient));
 }
 
@@ -95,68 +91,123 @@ void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
+	CSocketAPI::Close(pSocketClient->m_nSocket);
 	m_ListSocketClient.Del(&pSocketClient->m_List);
 	m_HashSocketClient.erase(pSocketClient);
+
+	FreeSocketClientObject(pSocketClient);	
 }
 
-//void CNetKernelThread::Loop()
-//{
-//	LoopIOCP();
-//	LoopListSocketClient();
-//	LoopBridgeQueue();
-//}
-//
-//void CNetKernelThread::LoopIOCP()
-//{
-//	bool bResult=true;
-//	while( true==bResult)
-//	{
-//		bResult = _LoopIOCP();
-//	}	
-//}
-//
-//bool CNetKernelThread::_LoopIOCP()
-//{
-//	BOOL bResult;
-//	DWORD dwNumBytes;
-//	CSocketClient *pSocketClient;
-//	OVERLAPPED *pOverLapped;
-//
-//	/*
-//		[in] Number of milliseconds that the caller is willing to wait for an completion packet to appear at the 
-//		completion port. If a completion packet does not appear within the specified time, the function times out, 
-//		returns FALSE, and sets *lpOverlapped to NULL. 	
-//	*/
-//	bResult = m_IOCP.GetStatus( (ULONG_PTR*)&pSocketClient, &dwNumBytes, &pOverLapped, 0);
-//	if( false==bResult && NULL==pOverLapped)    
-//	{
-//		//time out
-//		return false;
-//	}
-//
-//	if( 0==dwNumBytes || (false==bResult && NULL!=pOverLapped) )
-//	{
-//		pSocketClient->m_nStepFlag = IOCP_STEP_ERR;	
-//		return true;
-//	}
-//	
-//	switch (pSocketClient->m_nIOCPEvent)
-//	{
-//	case IOCP_EVENT_ACCEPT_CONNECT:
-//		DoSocketClientAccept(pSocketClient);
-//		break;
-//
-//	case IOCP_EVENT_RECV_BIG:
-//		pSocketClient->m_nStepFlag = IOCP_STEP_RECV_COMPLATE;
-//		break;
-//
-//	default:
-//		LOGNE("Warning, switch (pIOCPKey->nEvent) deault,nEvent:%d\n", pSocketClient->m_nIOCPEvent);
-//	}
-//
-//	return true;
-//}
-//
+bool CNetKernelThread::VerifySocketClientValid(unsigned int nSocketKey)
+{
+	//判断该对象是否还存在
+	if (m_HashSocketClient.end()==m_HashSocketClient.find(nSocketKey))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void CNetKernelThread::Loop()
+{
+	LoopIOCP();
+	LoopSendData();
+	LoopRecvData();
+	LoopConnect();
+}
+
+
+
+void CNetKernelThread::LoopIOCP()
+{
+	bool bResult=true;
+	while( true==bResult)
+	{
+		bResult = _LoopIOCP();
+	}	
+}
+
+bool CNetKernelThread::_LoopIOCP()
+{
+	BOOL bResult;
+	DWORD dwNumBytes;
+	CSocketClient *pSocketClient;
+	OVERLAPPED *pOverLapped;
+
+	/*
+		[in] Number of milliseconds that the caller is willing to wait for an completion packet to appear at the 
+		completion port. If a completion packet does not appear within the specified time, the function times out, 
+		returns FALSE, and sets *lpOverlapped to NULL. 	
+	*/
+	bResult = m_IOCP.GetStatus( (ULONG_PTR*)&pSocketClient, &dwNumBytes, &pOverLapped, 0);
+	if( false==bResult && NULL==pOverLapped)    
+	{
+		//time out
+		return false;
+	}
+
+	if( 0==dwNumBytes || (false==bResult && NULL!=pOverLapped) )
+	{
+		CloseClientSocket(pSocketClient);	
+		return true;
+	}
+	
+	switch (pSocketClient->m_nIOCPEvent)
+	{
+	case IOCP_EVENT_ACCEPT_CONNECT:
+		OnAcceptSocket(pSocketClient);
+		break;
+
+	case IOCP_EVENT_RECV_BIG:
+		OnAcceptSocket(pSocketClient);
+		break;
+
+	default:
+		LOGNE("Warning, switch (pIOCPKey->nEvent) deault,nEvent:%d\n", pSocketClient->m_nIOCPEvent);
+	}
+
+	return true;
+}
+
+void CNetKernelThread::OnAcceptSocket(CSocketClient *pSocketClient)
+{
+	IFn(NULL==pSocketClient)
+	{
+		return;
+	}
+
+	//加入链表
+	AddClientSocket(pSocketClient);
+
+	IFn( 0==m_IOCP.AssociateSocket(pSocketClient->m_nSocket,  (ULONG_PTR)pSocketClient) )
+	{
+		CloseClientSocket(pSocketClient);
+	}
+
+	IFn(-1==pSocketClient->Recv())
+	{
+		CloseClientSocket(pSocketClient);
+	}
+}
+
+void CNetKernelThread::OnRecvSocket(CSocketClient *pSocketClient)
+{
+	IFn(NULL==pSocketClient)
+	{
+		return;
+	}
+
+	if ( 1==g_NetBridgeQueue.PutLogicTaskQueue(&pSocketClient->m_RecvBuffer) )
+	{
+		//根据回调返回，是否需要投递
+		IFn(-1==pSocketClient->Recv())
+		{
+			CloseClientSocket(pSocketClient);
+		}
+	}
+}
+
 //void CNetKernelThread::LoopListSocketClient()
 //{
 //	CSocketClient *pSocketClient;
