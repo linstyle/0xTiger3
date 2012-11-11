@@ -8,7 +8,6 @@ CNetKernelThread::CNetKernelThread()
 	m_bThreadRun = true;
 	m_hThreadLoop = NULL;
 	m_uThreadLoop = 0;
-	m_vConnect.reserve(20);
 }
 
 CNetKernelThread::~CNetKernelThread()
@@ -60,7 +59,6 @@ bool CNetKernelThread::AddConnectSocket(const char* pConnectIP, USHORT nConnectP
 		return false;
 	}
 
-	pSocketClient->m_nStepFlag = IOCP_STEP_CONNECT;
 	pSocketClient->m_bAutoConnect = bAutoConnect;
 	pSocketClient->m_nPort = nConnectPort;
 	pSocketClient->m_nIP = inet_addr(pConnectIP);
@@ -75,7 +73,7 @@ void CNetKernelThread::AddClientSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	m_ListSocketClient.Add(&pSocketClient->m_List);
+	m_lSocketClient.Add(&pSocketClient->m_lNode);
 	m_HashSocketClient.insert(pair<pSocketClient->GetKey(), CSocketClient*>(pSocketClient,pSocketClient));
 }
 
@@ -86,13 +84,30 @@ void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	IFn( !VerifySocketClientValid(pSocketClient))
+	IFn( !VerifySocketClientValid(pSocketClient->GetKey()) )
 	{
 		return;
 	}
 
+	//LOG记录
+	in_addr addrIP;
+	addrIP.S_un.S_addr = pSocketClient->m_nIP;
+	LOGNN("Notice, CloseClientSocket. Socket:%d, IP:%s, Port:%d, AutoConnect:%d", 
+		pSocketClient->m_nSocket,
+		inet_ntoa( addrIP ),
+		pSocketClient->m_nPort,
+		pSocketClient->m_bAutoConnect
+		);	
+
+	if (true==pSocketClient->m_bAutoConnect)
+	{
+		m_lSocketClient.Del(&pSocketClient->m_lNode);
+		m_lConnect.Add(pSocketClient->m_lNode);
+		return;
+	}
+
 	CSocketAPI::Close(pSocketClient->m_nSocket);
-	m_ListSocketClient.Del(&pSocketClient->m_List);
+	m_lSocketClient.Del(&pSocketClient->m_lNode);
 	m_HashSocketClient.erase(pSocketClient);
 
 	FreeSocketClientObject(pSocketClient);	
@@ -111,18 +126,24 @@ bool CNetKernelThread::VerifySocketClientValid(unsigned int nSocketKey)
 
 void CNetKernelThread::Loop()
 {
-	LoopIOCP();
-	LoopSendData();
-	LoopRecvData();
-	LoopConnect();
+	__try
+	{
+		LoopIOCP();
+		LoopSendData();
+		LoopConnect();	
+	}
+	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))	
+	{
+		return;
+	}
+
 }
-
-
 
 void CNetKernelThread::LoopIOCP()
 {
 	bool bResult=true;
-	while( true==bResult)
+
+	while( bResult)
 	{
 		bResult = _LoopIOCP();
 	}	
@@ -160,7 +181,7 @@ bool CNetKernelThread::_LoopIOCP()
 		break;
 
 	case IOCP_EVENT_RECV_BIG:
-		OnAcceptSocket(pSocketClient);
+		OnRecvSocket(pSocketClient);
 		break;
 
 	default:
@@ -168,6 +189,90 @@ bool CNetKernelThread::_LoopIOCP()
 	}
 
 	return true;
+}
+
+void CNetKernelThread::LoopSendData()
+{
+	CSocketClient *pSocketClient;
+	list_head *pListIte;
+
+	list_for_each(pListIte,  &m_lSocketClient.m_lHead)
+	{
+		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lNode);
+		//send
+		IFn( -1==pSocketClient->FlushSend())
+		{
+			
+		}
+
+	}//end list_for_each
+}
+
+void CNetKernelThread::LoopConnect()
+{
+	list_head *pListIte;
+	list_head *pListIteTemp;
+	CSocketClient *pSocketClient;
+
+	list_for_each_safe(pListIte, pListIteTemp, &m_lConnect.m_lHead)
+	{
+		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lNode);
+
+		//虽然是无阻塞连接，但是不适合大量断连，服务端需要重连的场景
+		if ( 0==pSocketClient->Connect() )
+		{
+			m_lConnect.Del(pListIte);
+			//连接成功
+			IFn(-1==pSocketClient->Recv())
+			{				
+				CloseClientSocket(pSocketClient);
+			}			
+		}
+	}
+}
+
+void CNetKernelThread::LoopBridgeQueue()
+{
+	int nResult=0;
+	char BufferPacket[name_msg_packet::SOCKET_BUFF_SIZE*2];
+	while (1)
+	{
+		memset(BufferPacket, 0, sizeof(BufferPacket));
+		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, name_msg_packet::SOCKET_BUFF_SIZE);
+		if (1==nResult || -1==nResult)
+		{
+			break;
+		}
+
+		IFn(NULL==pBuffer)
+		{
+			return;
+		}
+
+		IPackHead *pPackHead = (IPackHead*)pBuffer;
+		if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
+		{
+			return DoBridgeNLInnerNotic((PNLInnerNotic*)pBuffer);
+		}
+
+		//
+		CSocketClient *pSocketClient = (CSocketClient*)pPackHead->GetNetObject();
+		IFn(NULL==pSocketClient)
+		{
+			return ;
+		}
+
+		//先检测pSocketClient还是否有效
+		IFn( !VerifySocketClientValid(pSocketClient) )
+		{
+			return;
+		}
+
+		IFn(-1==pSocketClient->Send(pBuffer, pPackHead->GetPacketSize()) )
+		{
+
+		}
+	}
 }
 
 void CNetKernelThread::OnAcceptSocket(CSocketClient *pSocketClient)
@@ -198,156 +303,16 @@ void CNetKernelThread::OnRecvSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	if ( 1==g_NetBridgeQueue.PutLogicTaskQueue(&pSocketClient->m_RecvBuffer) )
+	while (0==g_NetBridgeQueue.PutLogicTaskQueue(&pSocketClient->m_RecvBuffer))
 	{
-		//根据回调返回，是否需要投递
-		IFn(-1==pSocketClient->Recv())
-		{
-			CloseClientSocket(pSocketClient);
-		}
+		
+	}
+
+	IFn(-1==pSocketClient->Recv())
+	{
+		CloseClientSocket(pSocketClient);
 	}
 }
-
-//void CNetKernelThread::LoopListSocketClient()
-//{
-//	CSocketClient *pSocketClient;
-//	list_head *pListEach;
-//
-//	list_for_each(pListEach,  &m_ListSocketClient.m_ListHead)
-//	{
-//		pSocketClient = list_entry_offset(pListEach, CSocketClient, m_List);		
-//
-//		//recv step flag
-//		switch (pSocketClient->m_nStepFlag)
-//		{
-//		case IOCP_STEP_ERR:  //出错
-//			DoSocketClientErrAndNoticLogic(pSocketClient);
-//			continue;
-//			
-//			break;
-//
-//		case IOCP_STEP_RECV_ING:   //投递中，只做下发送
-//			break;
-//
-//		case IOCP_STEP_RECV_COMPLATE:  //投递完成
-//			DoSocketClientRecv(pSocketClient);
-//			break;
-//
-//		case IOCP_STEP_CONNECT:  //需要连接
-//			DoSocketClientConnect(pSocketClient);
-//			break;
-//		default:
-//			LOGNE("Err, CNetKernelThread::LoopListSocketClient(). m_nStepFlag:%d\n", pSocketClient->m_nStepFlag);
-//		}
-//
-//		//send
-//		IFn( -1==pSocketClient->FlushSend())
-//		{
-//			
-//		}
-//
-//	}//end list_for_each
-//}
-//
-//void CNetKernelThread::LoopBridgeQueue()
-//{
-//	int nResult=0;
-//	char BufferPacket[name_msg_packet::SOCKET_BUFF_SIZE*2];
-//	while (1)
-//	{
-//		memset(BufferPacket, 0, sizeof(BufferPacket));
-//		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, name_msg_packet::SOCKET_BUFF_SIZE);
-//		if (1==nResult || -1==nResult)
-//		{
-//			break;
-//		}
-//
-//		DoBridgeQueue(BufferPacket);
-//	}
-//}
-//
-//void CNetKernelThread::DoSocketClientRecv(CSocketClient *pSocketClient)
-//{
-//	IFn(NULL==pSocketClient)
-//	{
-//		return;
-//	}
-//
-//	if ( 1==g_NetBridgeQueue.PutLogicTaskQueue(&pSocketClient->m_RecvBuffer) )
-//	{
-//		//根据回调返回，是否需要投递
-//		PostIOCPRecv(pSocketClient);
-//	}
-//}
-//
-//void CNetKernelThread::DoSocketClientConnect(CSocketClient *pSocketClient)
-//{
-//	IFn(NULL==pSocketClient)
-//	{
-//		return;
-//	}
-//	/*
-//		@虽然是无阻塞连接，但是不适合大量断连，服务端需要重连的场景
-//	*/
-//	if ( 0==pSocketClient->Connect() )
-//	{
-//		PostIOCPRecv(pSocketClient);
-//	}
-//	
-//}
-//
-//void CNetKernelThread::DoSocketClientAccept(CSocketClient *pSocketClient)
-//{
-//	IFn(NULL==pSocketClient)
-//	{
-//		return;
-//	}
-//
-//	//加入链表
-//	AddToClientSocketList(pSocketClient);
-//
-//	IFn( 0==m_IOCP.AssociateSocket(pSocketClient->m_nSocket,  (ULONG_PTR)pSocketClient) )
-//	{
-//		pSocketClient->m_nStepFlag = IOCP_STEP_ERR;
-//		return;
-//	}
-//
-//	PostIOCPRecv(pSocketClient);
-//}
-//
-//void CNetKernelThread::DoSocketClientErr(CSocketClient *pSocketClient)
-//{
-//	IFn(NULL==pSocketClient)
-//	{
-//		return;
-//	}
-//
-//	if ( !VerifySocketClientValid(pSocketClient))
-//	{
-//		LOGNN("CNetKernelThread::DoSocketClientErr, Hash not find. %x\n", pSocketClient);
-//		return;
-//	}
-//
-//	//判断m_bAutoConnect字段
-//	if (true==pSocketClient->m_bAutoConnect)
-//	{
-//		pSocketClient->m_nStepFlag = IOCP_STEP_CONNECT;
-//		return;
-//	}
-//
-//	//先从本链表中删除
-//	DelFromClientSocketList(pSocketClient);
-//
-//	//LOG记录
-//	in_addr addrIP;
-//	addrIP.S_un.S_addr = pSocketClient->m_nIP;
-//	LOGNN("Notice, DoSocketClientErr Close. Socket:%d, IP:%s, Port:%d", 
-//		pSocketClient->m_nSocket,
-//		inet_ntoa( addrIP ),
-//		pSocketClient->m_nPort
-//		);	
-//
-//}
 //
 //void CNetKernelThread::DoSocketClientErrAndNoticLogic(CSocketClient *pSocketClient)
 //{
@@ -434,38 +399,18 @@ void CNetKernelThread::OnRecvSocket(CSocketClient *pSocketClient)
 //	}
 //}
 //
-//void CNetKernelThread::PostIOCPRecv(CSocketClient *pSocketClient)
-//{
-//	IFn(NULL==pSocketClient)
-//	{
-//		return;
-//	}
-//
-//	IFn(-1==pSocketClient->Recv())
-//	{
-//		pSocketClient->m_nStepFlag = IOCP_STEP_ERR;
-//	}
-//}
-//
-//bool CNetKernelThread::VerifySocketClientValid(CSocketClient *pSocketClient)
-//{
-//	//判断该对象是否还存在
-//	if (m_HashSocketClient.end()==m_HashSocketClient.find(pSocketClient))
-//	{
-//		return false;
-//	}
-//
-//	return true;
-//}
-//
-//unsigned int WINAPI CNetKernelThread::ThreadLoop(void* pParam)
-//{
-//	CNetKernelThread *pNetDriver=(CNetKernelThread*)pParam;
-//	while(pNetDriver->m_bThreadRun)
-//	{
-//		pNetDriver->Loop();
-//		Sleep(200);
-//	}
-//
-//	return 0;
-//}
+
+unsigned int WINAPI CNetKernelThread::ThreadLoop(void* pParam)
+{
+	IFn(!pParam)
+		return 0;
+
+	CNetKernelThread *pNetDriver=(CNetKernelThread*)pParam;
+	while(pNetDriver->m_bThreadRun)
+	{
+		pNetDriver->Loop();
+		Sleep(200);
+	}
+
+	return 0;
+}

@@ -229,7 +229,7 @@ public:
 	CList()
 	{
 		m_nListCount= 0 ;
-		INIT_LIST_HEAD(&m_ListHead);		
+		INIT_LIST_HEAD(&m_lHead);		
 	}
 
 	unsigned int GetCount()
@@ -240,7 +240,7 @@ public:
 	void Add(list_head *p)
 	{
 		++m_nListCount;
-		list_add(p, &m_ListHead);
+		list_add(p, &m_lHead);
 	}
 
 	void Del(list_head *p)
@@ -252,7 +252,7 @@ public:
 	/*
 		如果你想要有计数功能，请在增、删时使用Add,Del接口
 	*/
-	struct list_head m_ListHead;
+	struct list_head m_lHead;
 
 private:
 	unsigned int m_nListCount;	

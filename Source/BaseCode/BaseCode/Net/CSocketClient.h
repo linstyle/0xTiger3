@@ -89,7 +89,7 @@ public:
 	//传递给逻辑层的key,直接用地址的话，因为是异步的，怕重复
 	unsigned int m_nKey;
 
-	struct list_head m_List;
+	struct list_head m_lNode;
 private:
 
 };
