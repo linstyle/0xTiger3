@@ -17,18 +17,25 @@ public:
 	~CPacketFactory();
 
 	void AddPacketObject(IPacketObject* pPacketObject);
+	/*
+		ProcessMsg
+		返回值
+		false:表示出了很严重的问题，pPackHead所对应的网络套接字需要关闭
+	*/
+	bool ProcessMsg(IPackHead *pPackHead);
+
 	IPacketObject* GetPacketObject( int e );
+	
+
+private:
 	IPacketObject* GetPacketObject( IPackHead *pPackHead );
+
+public:
 
 private:
 	bool m_bFactory[PACKET1_MAX];
 	IPacketObject* m_Factory[PACKET1_MAX];
 	int m_nFactorySize;
-
-public:
-
-private:
-
 
 };
 

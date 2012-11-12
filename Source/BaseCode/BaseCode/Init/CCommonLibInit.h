@@ -11,7 +11,6 @@
 #include "CCmInitPackets.h"
 #include "CPacketFactory.h"
 
-
 //#include "CThreadPool.h"
 //#include "CThreadQuit.h"
 //#include "CNetTransToLogic.h"

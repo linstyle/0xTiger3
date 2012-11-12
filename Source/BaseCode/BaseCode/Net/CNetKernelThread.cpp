@@ -77,7 +77,7 @@ void CNetKernelThread::AddClientSocket(CSocketClient *pSocketClient)
 	m_HashSocketClient.insert(pair<pSocketClient->GetKey(), CSocketClient*>(pSocketClient,pSocketClient));
 }
 
-void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient)
+void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogic/*=true*/)
 {
 	IFn(NULL==pSocketClient)
 	{
@@ -99,7 +99,7 @@ void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient)
 		pSocketClient->m_bAutoConnect
 		);	
 
-	if (true==pSocketClient->m_bAutoConnect)
+	if (pSocketClient->m_bAutoConnect)
 	{
 		m_lSocketClient.Del(&pSocketClient->m_lNode);
 		m_lConnect.Add(pSocketClient->m_lNode);
@@ -110,7 +110,13 @@ void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient)
 	m_lSocketClient.Del(&pSocketClient->m_lNode);
 	m_HashSocketClient.erase(pSocketClient);
 
-	FreeSocketClientObject(pSocketClient);	
+	FreeSocketClientObject(pSocketClient);
+
+	//通知逻辑层，表示这个错误是网络层主动发起的
+	if (bNotifyLogic)
+	{
+
+	}
 }
 
 bool CNetKernelThread::VerifySocketClientValid(unsigned int nSocketKey)
@@ -122,6 +128,11 @@ bool CNetKernelThread::VerifySocketClientValid(unsigned int nSocketKey)
 	}
 
 	return true;
+}
+
+CSocketClient* CNetKernelThread::GetSocketClientByKey(unsigned int nSocketKey)
+{
+	return m_HashSocketClient.find(nSocketKey);
 }
 
 void CNetKernelThread::Loop()
@@ -235,6 +246,8 @@ void CNetKernelThread::LoopBridgeQueue()
 {
 	int nResult=0;
 	char BufferPacket[name_msg_packet::SOCKET_BUFF_SIZE*2];
+	const char* pBuffer = BufferPacket;
+
 	while (1)
 	{
 		memset(BufferPacket, 0, sizeof(BufferPacket));
@@ -244,33 +257,30 @@ void CNetKernelThread::LoopBridgeQueue()
 			break;
 		}
 
-		IFn(NULL==pBuffer)
-		{
-			return;
-		}
-
 		IPackHead *pPackHead = (IPackHead*)pBuffer;
+		CSocketClient *pSocketClient = GetSocketClientByKey(pPackHead->GetNetKey());
+
 		if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
 		{
-			return DoBridgeNLInnerNotic((PNLInnerNotic*)pBuffer);
+			if(-1==g_PacketFactory.ProcessMsg(pPackHead))
+			{
+				CloseClientSocket(pSocketClient);
+			}
+			
+			continue;
 		}
 
 		//
-		CSocketClient *pSocketClient = (CSocketClient*)pPackHead->GetNetObject();
+		
 		IFn(NULL==pSocketClient)
 		{
-			return ;
-		}
-
-		//先检测pSocketClient还是否有效
-		IFn( !VerifySocketClientValid(pSocketClient) )
-		{
-			return;
+			continue;
 		}
 
 		IFn(-1==pSocketClient->Send(pBuffer, pPackHead->GetPacketSize()) )
 		{
-
+			CloseClientSocket(pSocketClient);
+			continue;
 		}
 	}
 }
@@ -313,6 +323,12 @@ void CNetKernelThread::OnRecvSocket(CSocketClient *pSocketClient)
 		CloseClientSocket(pSocketClient);
 	}
 }
+
+void CNetKernelThread::OnProcessLogicMsg(PNLInnerNotic* pPacketBuffer)
+{
+	
+}
+
 //
 //void CNetKernelThread::DoSocketClientErrAndNoticLogic(CSocketClient *pSocketClient)
 //{

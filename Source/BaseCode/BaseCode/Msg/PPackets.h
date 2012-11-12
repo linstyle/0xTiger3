@@ -70,18 +70,18 @@ class IPackHead
 public:
 	IPackHead(PACKET_DEFINE1 nPacketDefine1, int nPacketSize);
 
-	void SetNetObject(void *pNetObject);
-	void* GetNetObject()  const;
+	void SetNetKey(unsigned int nNetKey);
+	unsigned int  GetNetKey();
 
 	void SetPacketDefine2(PACKET_DEFINE2 nPacketDefine2);
 	void SetPacketSize(int nPacketSize);
 
-	PACKET_DEFINE1 GetPacketDefine1() const;
-	PACKET_DEFINE2 GetPacketDefine2() const;
+	PACKET_DEFINE1 GetPacketDefine1();
+	PACKET_DEFINE2 GetPacketDefine2();
 
 	//包大小，head+content
-	int GetPacketSize()  const;
-	int GetPacketContentSize()  const;
+	int GetPacketSize();
+	int GetPacketContentSize();
 
 private:
 
@@ -92,7 +92,8 @@ private:
 	PACKET_DEFINE1 m_nPacketDefine1;
 	PACKET_DEFINE2 m_nPacketDefine2;
 	int m_nRoutePriority;//路由转发的等级, 需要手动设置
-	void *m_pNetObject; //网络层，逻辑层相对来说是不同的节点。所以他们之间传递的参数也属于协议包一部分
+	
+	unsigned int  m_nNetKey; //网络层的KEY
 };
 
 namespace name_msg_packet
