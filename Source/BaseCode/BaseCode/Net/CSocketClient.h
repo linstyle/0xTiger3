@@ -37,7 +37,7 @@ namespace socket_circle_config
 	const int SEND_CIRCLE_LEN = 16*1024; //kb，跟具体业务有关
 };
 
-static unsigned int SOCKET_KEY_SEED;
+static unsigned int SOCKET_KEY_SEED = 0;
 class CSocketClient
 {
 public:

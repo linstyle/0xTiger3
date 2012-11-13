@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Singleton.h"
-#include "IPackets.h"
+#include "PPackets.h"
 #include "CPacketFactory.h"
 
 //这里需要修改

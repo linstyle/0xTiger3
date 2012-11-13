@@ -51,19 +51,14 @@ public:
 	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort);
 
 	/*
-		@NoticNetErr
+		@CloseNet
 		@通知网络层，逻辑层有错误发生
-		@pNetObject:这个参数就是当网络层accept到一个套接字时，会通知逻辑层的附带参数
+		@nNetKey:网络层传递给逻辑岑的标识
 	*/
-	bool NoticNetErr(void *pNetObject);
+	int CloseNet(unsigned int nNetKey);
 
-	/*
-		@GetPacketStream
-		@从队列中获取一个网络包
-		@pNetObject:这个参数就是当网络层accept到一个套接字时，会通知逻辑层的附带参数
-	*/
-	int GetPacketStream(char *pBuffer, int nBufferLen);
-	int PutPacketStream(const char *pBuffer, int nBufferLen);
+	//int GetPacketStream(char *pBuffer, int nBufferLen);
+	int SendPacket(IPackHead* pPackHead);
 
 private:
 	/*

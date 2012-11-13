@@ -48,53 +48,62 @@ bool CNetDriver2::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 	return true;
 }
 
-bool CNetDriver2::NoticNetErr(void *pNetObject)
+int CNetDriver2::CloseNet(unsigned int nNetKey)
 {
-	IFn(!pNetObject)
-		return false;
-
 	PNLInnerNotic msgInnerNotic;
 	msgInnerNotic.SetPacketDefine2( PACKET2_LTON_ERR);
-	msgInnerNotic.SetNetObject(pNetObject);
+	msgInnerNotic.SetNetKey(nNetKey);
 
-	IFn (-1==g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize()))
-	{
-		return false;
-	}
-
-	return true;
-}
-
-int CNetDriver2::GetPacketStream(char *pBuffer, int nBufferLen)
-{
-	IFn(!pBuffer)
-		return -1;
-
-	__try
-	{
-		return g_NetBridgeQueue.GetLogicTaskQueue(pBuffer, nBufferLen);
-	}
-	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
-	{
-		return false;
-	}	
+	int nResult = g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize());
 	
+	if(-1==nResult)
+	{
+		LOGNE("CNetDriver2::CloseNet,-1==PutNetTaskQueue.nNetKey:%d\n", nNetKey);
+	}
+
+	return nResult;
 }
 
-int CNetDriver2::PutPacketStream(const char *pBuffer, int nBufferLen)
+int CNetDriver2::SendPacket(IPackHead* pPackHead)
 {
-	IFn(!pBuffer)
+	IFn(!pPackHead)
 		return -1;
 
 	__try
 	{
-		return g_NetBridgeQueue.PutNetTaskQueue(pBuffer, nBufferLen);
+		const char* pBuffer = (const char*)pPackHead;
+		int nBufferLen = pPackHead->GetPacketSize();
+
+		int nResult = g_NetBridgeQueue.PutNetTaskQueue(pBuffer, nBufferLen);
+		if (-1==nResult)
+		{
+			LOGNE("CNetDriver2::PutPacketStream,-1==PutNetTaskQueue.nNetKey:%d, nDefine1:%d, nDefine2:%d\n", 
+				pPackHead->GetNetKey(), pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());			
+		}
+
+		return nResult;
 	}
 	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
 	{
 		return false;
 	}	
 }
+
+//int CNetDriver2::GetPacketStream(char *pBuffer, int nBufferLen)
+//{
+//	IFn(!pBuffer)
+//		return -1;
+//
+//	__try
+//	{
+//		return g_NetBridgeQueue.GetLogicTaskQueue(pBuffer, nBufferLen);
+//	}
+//	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
+//	{
+//		return false;
+//	}	
+//	
+//}
 
 void CNetDriver2::Init()
 {	

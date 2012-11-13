@@ -9,7 +9,7 @@ bool net::SetSocketServer(const char* pName, const char* pListenIP, USHORT nList
 
 bool net::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 {
-	return g_NetDriver2.AddClientSocket(pConnectIP, nConnectPort);
+	return g_NetDriver2.AddConnectSocket(pConnectIP, nConnectPort);
 }
 
 void net::Init()
@@ -17,18 +17,14 @@ void net::Init()
 	return g_NetDriver2.Init();
 }
 
-int net::GetPacketStream(char *pBuffer, int nBufferLen)
-{
-	return g_NetDriver2.GetPacketStream(pBuffer, nBufferLen);
-}
 
-int net::PutPacketStream(const char *pBuffer, int nBufferLen)
+int net::SendPacket(IPackHead* pPackHead)
 {
-	return g_NetDriver2.PutPacketStream(pBuffer, nBufferLen);
+	return g_NetDriver2.SendPacket(pPackHead);
 }
 
 
-//bool net::NoticNetErr()
-//{
-//
-//}
+int net::CloseNet(unsigned int nNetKey)
+{
+	return g_NetDriver2.CloseNet(nNetKey);
+}

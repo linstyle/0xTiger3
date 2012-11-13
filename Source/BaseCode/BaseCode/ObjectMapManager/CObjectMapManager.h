@@ -15,7 +15,7 @@
 #include "Singleton.h"
 #include "CBaseLogicPlayer.h"
 #include "CMyStackWalker.h"
-#include "IPackets.h"
+#include "PPackets.h"
 #include <map>
 
 using namespace std;

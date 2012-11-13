@@ -7,7 +7,7 @@
 
 
 #include "Singleton.h"
-#include "IPackets.h"
+#include "PPackets.h"
 
 
 class CPacketFactory:public Singleton<CPacketFactory>
@@ -17,12 +17,7 @@ public:
 	~CPacketFactory();
 
 	void AddPacketObject(IPacketObject* pPacketObject);
-	/*
-		ProcessMsg
-		返回值
-		false:表示出了很严重的问题，pPackHead所对应的网络套接字需要关闭
-	*/
-	bool ProcessMsg(IPackHead *pPackHead);
+	void ProcessMsg(IPackHead *pPackHead);
 
 	IPacketObject* GetPacketObject( int e );
 	

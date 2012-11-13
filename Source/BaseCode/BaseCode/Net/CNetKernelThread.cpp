@@ -1,6 +1,7 @@
 #include "CNetKernelThread.h"
 #include "NetCallBackFun.h"
 #include "GlobalMacro.h"
+#include "CSocketAPI.h"
 #include <process.h>
 
 CNetKernelThread::CNetKernelThread()
@@ -74,7 +75,7 @@ void CNetKernelThread::AddClientSocket(CSocketClient *pSocketClient)
 	}
 
 	m_lSocketClient.Add(&pSocketClient->m_lNode);
-	m_HashSocketClient.insert(pair<pSocketClient->GetKey(), CSocketClient*>(pSocketClient,pSocketClient));
+	m_HashSocketClient.insert(pair<unsigned int, CSocketClient*>(pSocketClient->GetKey(),pSocketClient));
 }
 
 void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogic/*=true*/)
@@ -99,21 +100,22 @@ void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient,bool bNoti
 		pSocketClient->m_bAutoConnect
 		);	
 
-	if (pSocketClient->m_bAutoConnect)
+	if(pSocketClient->m_bAutoConnect)
 	{
 		m_lSocketClient.Del(&pSocketClient->m_lNode);
-		m_lConnect.Add(pSocketClient->m_lNode);
+		m_lConnect.Add(&pSocketClient->m_lNode);
 		return;
 	}
 
 	CSocketAPI::Close(pSocketClient->m_nSocket);
 	m_lSocketClient.Del(&pSocketClient->m_lNode);
-	m_HashSocketClient.erase(pSocketClient);
+	m_HashSocketClient.erase(pSocketClient->GetKey());
 
+	//最后Free掉
 	FreeSocketClientObject(pSocketClient);
 
 	//通知逻辑层，表示这个错误是网络层主动发起的
-	if (bNotifyLogic)
+	if(bNotifyLogic)
 	{
 
 	}
@@ -132,7 +134,14 @@ bool CNetKernelThread::VerifySocketClientValid(unsigned int nSocketKey)
 
 CSocketClient* CNetKernelThread::GetSocketClientByKey(unsigned int nSocketKey)
 {
-	return m_HashSocketClient.find(nSocketKey);
+	HASH_SOCKETCLIENT::iterator ite = m_HashSocketClient.find(nSocketKey);
+
+	if(ite==m_HashSocketClient.end())
+	{
+		return NULL;
+	}
+
+	return ite->second;
 }
 
 void CNetKernelThread::Loop()
@@ -259,21 +268,15 @@ void CNetKernelThread::LoopBridgeQueue()
 
 		IPackHead *pPackHead = (IPackHead*)pBuffer;
 		CSocketClient *pSocketClient = GetSocketClientByKey(pPackHead->GetNetKey());
-
-		if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
+		IFn(NULL==pSocketClient)
 		{
-			if(-1==g_PacketFactory.ProcessMsg(pPackHead))
-			{
-				CloseClientSocket(pSocketClient);
-			}
-			
 			continue;
 		}
 
-		//
-		
-		IFn(NULL==pSocketClient)
+		//逻辑层和网络层内部的包
+		if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
 		{
+			g_PacketFactory.ProcessMsg(pPackHead);			
 			continue;
 		}
 
@@ -323,98 +326,6 @@ void CNetKernelThread::OnRecvSocket(CSocketClient *pSocketClient)
 		CloseClientSocket(pSocketClient);
 	}
 }
-
-void CNetKernelThread::OnProcessLogicMsg(PNLInnerNotic* pPacketBuffer)
-{
-	
-}
-
-//
-//void CNetKernelThread::DoSocketClientErrAndNoticLogic(CSocketClient *pSocketClient)
-//{
-//	IFn(NULL==pSocketClient)
-//	{
-//		return;
-//	}
-//
-//	//判断该对象是否还存在
-//	if (!VerifySocketClientValid(pSocketClient))
-//	{
-//		LOGNN("CNetKernelThread::DoSocketClientErrAndNoticLogic, Hash not find. %x\n", pSocketClient);
-//		return;
-//	}
-//
-//	DoSocketClientErr(pSocketClient);
-//
-//	//调用回调函数
-//	PNLInnerNotic msgInnerNotic;
-//	msgInnerNotic.SetPacketDefine2(PACKET2_NTOL_ERR);
-//	msgInnerNotic.SetNetObject( (void*)pSocketClient );
-//
-//	if ( -1==g_NetBridgeQueue.PutLogicTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize()) )
-//	{
-//		LOGNN("Notic, CNetKernelThread::DoSocketClientErr. -1==PutLogicTaskQueue\n");
-//	}
-//}
-//
-//void CNetKernelThread::DoBridgeQueue(const char *pBuffer)
-//{
-//	IFn(NULL==pBuffer)
-//	{
-//		return;
-//	}
-//
-//	IPackHead *pPackHead = (IPackHead*)pBuffer;
-//	if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
-//	{
-//		return DoBridgeNLInnerNotic((PNLInnerNotic*)pBuffer);
-//	}
-//
-//	//
-//	CSocketClient *pSocketClient = (CSocketClient*)pPackHead->GetNetObject();
-//	IFn(NULL==pSocketClient)
-//	{
-//		return ;
-//	}
-//
-//	//先检测pSocketClient还是否有效
-//	IFn( !VerifySocketClientValid(pSocketClient) )
-//	{
-//		return;
-//	}
-//
-//	IFn(-1==pSocketClient->Send(pBuffer, pPackHead->GetPacketSize()) )
-//	{
-//	
-//	}
-//}
-//
-//void CNetKernelThread::DoBridgeNLInnerNotic(PNLInnerNotic *pNLInnerNotic)
-//{
-//	IFn(NULL==pNLInnerNotic)
-//	{
-//		return;
-//	}
-//
-//	switch(pNLInnerNotic->GetPacketDefine2())
-//	{
-//		// PACKET2_LTON_SERVER_SOCKET,  已直接转给CNetAcceptThread模块
-//	case PACKET2_LTON_CONNECT_SOCKET:
-//		in_addr addrIP;
-//		addrIP.S_un.S_addr = pNLInnerNotic->m_nIP;
-//		AddClientSocket(inet_ntoa( addrIP ), pNLInnerNotic->m_nPort, pNLInnerNotic->m_bAutoConnect);
-//		break;
-//
-//	case PACKET2_LTON_ERR:
-//		DoSocketClientErr( (CSocketClient*)pNLInnerNotic->m_ErrParam);
-//		break;
-//
-//	default:
-//		LOGNE("Err, CNetKernelThread::DoBridgeNLInnerNotic, case default:%d\n", pNLInnerNotic->GetPacketDefine2());
-//
-//	}
-//}
-//
 
 unsigned int WINAPI CNetKernelThread::ThreadLoop(void* pParam)
 {

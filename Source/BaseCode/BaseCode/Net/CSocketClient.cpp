@@ -3,8 +3,6 @@
 #include "CSocketAPI.h"
 #include "GlobalMacro.h"
 
-SOCKET_KEY_SEED = 0;
-
 CSocketClient*  MallocSocketClientObject()
 {
 	//void *p = name_slab::kmem_malloc(sizeof(CSocketClient));	
@@ -54,7 +52,6 @@ CSocketClient::~CSocketClient()
 
 void CSocketClient::Init()
 {
-	m_nStepFlag = IOCP_STEP_INIT;
 	m_nIP = m_nPort = m_nSocket = 0;
 
 	m_RecvBuffer.Init(socket_circle_config::RECV_CIRCLE_LEN);
@@ -133,7 +130,6 @@ void CSocketClient::InitRecv()
 	InitRecv1();
 	InitRecv2();	
 	m_nWSARecvFlag = 0;
-	m_nStepFlag = IOCP_STEP_RECV_ING;
 	m_nIOCPEvent = IOCP_EVENT_RECV_BIG;
 	memset(&m_OverlappedRecv, 0, sizeof(m_OverlappedRecv));
 }

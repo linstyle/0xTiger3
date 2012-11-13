@@ -64,6 +64,14 @@ enum PACKET_DEFINE2
 	协议的头部
 	该类的大小，放于后期优化
 */
+namespace name_msg_packet
+{
+	/*
+		 byte，每个网络包最大字节数,具体跟MTU相关。以普通的MTU 1400为例，定为2800
+	*/
+	const unsigned int SOCKET_BUFF_SIZE = 2800; 
+	const unsigned int PACKET_HEAD_SIZE = sizeof(IPackHead);
+};
 
 class IPackHead
 {
@@ -94,16 +102,12 @@ private:
 	int m_nRoutePriority;//路由转发的等级, 需要手动设置
 	
 	unsigned int  m_nNetKey; //网络层的KEY
+
+	char m_Buffer[SOCKET_BUFF_SIZE];
+	char* m_pBuffer;
 };
 
-namespace name_msg_packet
-{
-	/*
-		 byte，每个网络包最大字节数,具体跟MTU相关。以普通的MTU 1400为例，定为2800
-	*/
-	const unsigned int SOCKET_BUFF_SIZE = 2800; 
-	const unsigned int PACKET_HEAD_SIZE = sizeof(IPackHead);
-};
+
 
 /*
 	协议的处理对象基类

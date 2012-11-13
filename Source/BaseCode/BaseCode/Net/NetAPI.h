@@ -12,8 +12,6 @@ namespace net
 	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort);
 	void Init();
 
-	int GetPacketStream(char *pBuffer, int nBufferLen);
-	int PutPacketStream(const char *pBuffer, int nBufferLen);
-
-	bool NoticNetErr();
+	int SendPacket(IPackHead* pPackHead);
+	int CloseNet(unsigned int nNetKey);
 };

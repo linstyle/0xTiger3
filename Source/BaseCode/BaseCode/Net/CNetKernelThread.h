@@ -59,7 +59,7 @@ private:
 		VerifySocketClientValid
 		检测CSocketClient对象是否有效
 	*/
-	bool AddClientSocket(CSocketClient *pSocketClient);
+	void AddClientSocket(CSocketClient *pSocketClient);
 	void CloseClientSocket(CSocketClient *pSocketClient, bool bNotifyLogic=true);
 	bool VerifySocketClientValid(unsigned int nSocketKey);
 	CSocketClient* GetSocketClientByKey(unsigned int nSocketKey);
@@ -67,12 +67,10 @@ private:
 		help函数
 		OnAcceptSocket:当有套接字进来
 		OnRecvSocket:当套接字收到数据
-		OnProcessLogicMsg:处理逻辑层的消息
 	*/
 	bool _LoopIOCP();
 	void OnAcceptSocket(CSocketClient *pSocketClient);
 	void OnRecvSocket(CSocketClient *pSocketClient);
-	void OnProcessLogicMsg(PNLInnerNotic* pPacketBuffer);
 public:
 
 private:
