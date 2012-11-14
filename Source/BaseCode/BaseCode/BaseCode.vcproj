@@ -694,6 +694,14 @@
 				RelativePath=".\Msg\PPackets.h"
 				>
 			</File>
+			<Filter
+				Name="include"
+				>
+				<File
+					RelativePath=".\Msg\PacketDefine.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="GUID"

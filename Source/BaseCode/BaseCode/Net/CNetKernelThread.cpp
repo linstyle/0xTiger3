@@ -254,13 +254,13 @@ void CNetKernelThread::LoopConnect()
 void CNetKernelThread::LoopBridgeQueue()
 {
 	int nResult=0;
-	char BufferPacket[name_msg_packet::SOCKET_BUFF_SIZE*2];
+	char BufferPacket[name_msg_packet::PACKET_BUFF_SIZE*2];
 	const char* pBuffer = BufferPacket;
 
 	while (1)
 	{
 		memset(BufferPacket, 0, sizeof(BufferPacket));
-		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, name_msg_packet::SOCKET_BUFF_SIZE);
+		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, name_msg_packet::PACKET_BUFF_SIZE);
 		if (1==nResult || -1==nResult)
 		{
 			break;

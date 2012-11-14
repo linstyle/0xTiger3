@@ -32,7 +32,7 @@ void CNetBridgeQueue::Release()
 
 int CNetBridgeQueue::GetLogicTaskQueue(char *pBuffer, int nBufferLen)
 {
-	IF(nBufferLen!=name_msg_packet::SOCKET_BUFF_SIZE || NULL==pBuffer)
+	IF(nBufferLen!=name_msg_packet::PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
 		return -1;
 	}
@@ -51,7 +51,7 @@ int CNetBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 	}
 
 	IPackHead PackHead(PACKET1_MIN,0);
-	char BufferPacket[name_msg_packet::SOCKET_BUFF_SIZE]={0};
+	char BufferPacket[name_msg_packet::PACKET_BUFF_SIZE]={0};
 
 	//读头部数据大小字段
 	if( -1==pRecvBuffer->TryReadBuffer((char*)&PackHead,  name_msg_packet::PACKET_HEAD_SIZE) )
@@ -89,7 +89,7 @@ int CNetBridgeQueue::PutLogicTaskQueue(char *pBuffer, int nBufferLen)
 
 int CNetBridgeQueue::GetNetTaskQueue(char *pBuffer, int nBufferLen)
 {
-	IFn(nBufferLen!=name_msg_packet::SOCKET_BUFF_SIZE || NULL==pBuffer)
+	IFn(nBufferLen!=name_msg_packet::PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
 		return -1;
 	}
