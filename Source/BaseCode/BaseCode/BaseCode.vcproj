@@ -679,6 +679,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Msg\PInnerTransfer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Msg\PInnerTransfer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Msg\PLogin.cpp"
 				>
 			</File>
