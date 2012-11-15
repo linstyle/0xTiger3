@@ -14,40 +14,51 @@
 	上层协议继承IPackHead后，在构造函数中用指针指向m_pBuffer，配合AddPacketSize开始使用
 */
 
+/*
+    单位:byte
+	PACKET_BUFF_SIZE:设置按普通MTU=1500来配置
+	PACKET_BUFF_SIZE_INNER:逻辑层和网络层之间通讯额外的长度。比如nNetKey的位置等。
+	
+	在对外使用判断的时候以PACKET_BUFF_SIZE为准
+*/
+const int NET_PACKET_BUFF_SIZE = 1500*2; 
+const int NET_PACKET_BUFF_SIZE_INNER = 20;
 
-//按普通MTU=1500来配置
-const int PACKET_BUFF_SIZE = 1500*2; 
+struct NET_PUBLIC_HEAD
+{
+	NET_PUBLIC_HEAD()
+	{
+		memset(this, 0, sizeof(NET_PUBLIC_HEAD));
+	}
+	unsigned short m_nPacketSize;
+	unsigned short m_nPacketDefine1;
+	unsigned short m_nPacketDefine2;	
+};
+
+//头部大小，即unsigned short m_nPacketSize
+const int NET_PACKET_HEAD_SIZE = sizeof(NET_PUBLIC_HEAD);
 
 class IPackHead
 {
 public:
 	IPackHead();
 
-	bool SetPacketDefine1(PACKET_DEFINE1 nPacketDefine1);
-	bool SetPacketDefine2(PACKET_DEFINE2 nPacketDefine2);
+	//如果是用已经数据新建一个包，需要调用下此函数
+	bool InitByCreate(const char* pDesBuffer, unsigned short nBufferSize);
+
+	//纯虚的处理函数，表示收到包后的处理
+	virtual void Process() = 0;
 	
+	char* GetPacketBuffer();
+	unsigned short GetPacketSize(); 
 	unsigned short GetPacketDefine1();
 	unsigned short GetPacketDefine2();
-
-	bool AddPacketSize(int nPacketSize);
-
-	unsigned short GetPacketSize();
-	char* GetPacketBuffer();
-
-
-	//底层使用
-	const char* K_GetPacketBuffer();
 private:
 
 public:
 
 private:
-	unsigned short m_nPacketSize;  //包大小，head+content
-	unsigned short m_nPacketDefine1;
-	unsigned short m_nPacketDefine2;	
-
-	char m_Buffer[PACKET_BUFF_SIZE];
-	char* m_pBuffer;
+	char m_Buffer[NET_PACKET_BUFF_SIZE+NET_PACKET_BUFF_SIZE_INNER];
 };
 
 
@@ -55,25 +66,21 @@ private:
 /*
 	协议的处理对象基类
 */
-class IPacketObject
-{
-public:
-	PACKET_DEFINE1 m_nPacketDefine;	
-
-private:
-
-public:
-	IPacketObject(PACKET_DEFINE1 nPacketDefine);
-	PACKET_DEFINE1 GetPacketID();
-
-	/*
-		RoleObject在处理Accept事件时表示RoleNet对象,
-		否则表示Role对象
-	*/
-	virtual int	Execute(IPackHead* pPackHead)=0;
-
-private:
-
-
-};
+//class IPacketObject
+//{
+//public:
+//	PACKET_DEFINE1 m_nPacketDefine;	
+//
+//private:
+//
+//public:
+//	IPacketObject(PACKET_DEFINE1 nPacketDefine);
+//	PACKET_DEFINE1 GetPacketID();
+//
+//	virtual int	Execute(IPackHead* pPackHead)=0;
+//
+//private:
+//
+//
+//};
 

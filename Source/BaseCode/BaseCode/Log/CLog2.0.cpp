@@ -244,6 +244,7 @@ void CLogManager2::Init()
 	LOGE("");
 
 	LOGNN("");
+	LOGNW("");
 	LOGNE("");
 
 	LOGMN("");

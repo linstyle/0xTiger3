@@ -149,8 +149,9 @@ void CNetKernelThread::Loop()
 	__try
 	{
 		LoopIOCP();
-		LoopSendData();
-		LoopConnect();	
+		LoopConnect();
+		LoopSendData();			
+		LoopBridgeQueue();
 	}
 	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))	
 	{
@@ -254,20 +255,20 @@ void CNetKernelThread::LoopConnect()
 void CNetKernelThread::LoopBridgeQueue()
 {
 	int nResult=0;
-	char BufferPacket[name_msg_packet::PACKET_BUFF_SIZE*2];
+	char BufferPacket[NET_PACKET_BUFF_SIZE*2];
 	const char* pBuffer = BufferPacket;
 
 	while (1)
 	{
 		memset(BufferPacket, 0, sizeof(BufferPacket));
-		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, name_msg_packet::PACKET_BUFF_SIZE);
+		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, NET_PACKET_BUFF_SIZE);
 		if (1==nResult || -1==nResult)
 		{
 			break;
 		}
 
-		IPackHead *pPackHead = (IPackHead*)pBuffer;
-		CSocketClient *pSocketClient = GetSocketClientByKey(pPackHead->GetNetKey());
+		IPackHead* pPackHead = (IPackHead*)pBuffer;
+		CSocketClient *pSocketClient = GetSocketClientByKey(pPackHead->);
 		IFn(NULL==pSocketClient)
 		{
 			continue;
@@ -276,11 +277,11 @@ void CNetKernelThread::LoopBridgeQueue()
 		//逻辑层和网络层内部的包
 		if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
 		{
-			g_PacketFactory.ProcessMsg(pPackHead);			
+			pPackHead->Process();
 			continue;
 		}
 
-		IFn(-1==pSocketClient->Send(pBuffer, pPackHead->GetPacketSize()) )
+		IFn(-1==pSocketClient->Send(pPackHead->GetPacketBuffer(), pPackHead->GetPacketSize()) )
 		{
 			CloseClientSocket(pSocketClient);
 			continue;

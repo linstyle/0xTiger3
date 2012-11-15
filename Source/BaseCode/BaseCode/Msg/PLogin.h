@@ -21,7 +21,7 @@ public:
 	PLogin():IPackHead(_PacketID1, sizeof(this))
 	{
 
-		STATIC_ASSERT( sizeof(PLogin)<name_msg_packet::PACKET_BUFF_SIZE );		
+		STATIC_ASSERT( sizeof(PLogin)<NET_PACKET_BUFF_SIZE );		
 	}
 };
 

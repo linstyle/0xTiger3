@@ -32,7 +32,7 @@ void CNetBridgeQueue::Release()
 
 int CNetBridgeQueue::GetLogicTaskQueue(char *pBuffer, int nBufferLen)
 {
-	IF(nBufferLen!=name_msg_packet::PACKET_BUFF_SIZE || NULL==pBuffer)
+	IF(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
 		return -1;
 	}
@@ -51,10 +51,10 @@ int CNetBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 	}
 
 	IPackHead PackHead(PACKET1_MIN,0);
-	char BufferPacket[name_msg_packet::PACKET_BUFF_SIZE]={0};
+	char BufferPacket[NET_PACKET_BUFF_SIZE]={0};
 
 	//读头部数据大小字段
-	if( -1==pRecvBuffer->TryReadBuffer((char*)&PackHead,  name_msg_packet::PACKET_HEAD_SIZE) )
+	if( -1==pRecvBuffer->TryReadBuffer((char*)&PackHead,  PACKET_HEAD_SIZE) )
 	{
 		return 1;
 	}
@@ -69,7 +69,7 @@ int CNetBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 	pRecvBuffer->ReadBufferFlush(PackHead.GetPacketSize());
 
 	//长度我随便写的，体检检测下空间大小，如果不够直接投递，不必等到下次
-	if (pRecvBuffer->GetUseLength()<name_msg_packet::PACKET_HEAD_SIZE * 3) 
+	if (pRecvBuffer->GetUseLength()<PACKET_HEAD_SIZE * 3) 
 	{
 		return 1;
 	}
@@ -89,7 +89,7 @@ int CNetBridgeQueue::PutLogicTaskQueue(char *pBuffer, int nBufferLen)
 
 int CNetBridgeQueue::GetNetTaskQueue(char *pBuffer, int nBufferLen)
 {
-	IFn(nBufferLen!=name_msg_packet::PACKET_BUFF_SIZE || NULL==pBuffer)
+	IFn(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
 		return -1;
 	}
@@ -110,8 +110,8 @@ int CNetBridgeQueue::GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer,
 {
 	int nPacketIdent=0;
 
-	IPackHead PackHead(PACKET1_MIN,0);
-	if (-1==pSrcCircleBuffer->TryReadBuffer((char*)&PackHead,  name_msg_packet::PACKET_HEAD_SIZE) )
+	IPackHead PackHead;
+	if (-1==pSrcCircleBuffer->TryReadBuffer((char*)&PackHead, NET_PACKET_HEAD_SIZE) )
 	{
 		return 1;
 	}

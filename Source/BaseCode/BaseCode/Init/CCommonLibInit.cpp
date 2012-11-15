@@ -14,8 +14,8 @@ CCommonLibInit::CCommonLibInit()
 	new CLogManager2;                       //日志
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CLogManager2 OK\n");
 
-	new CPacketFactory;						//包工厂
-	printf("Notic, CCommonLibInit::CCommonLibInit():New CPacketFactory OK\n");
+	//new CPacketFactory;						//包工厂
+	//printf("Notic, CCommonLibInit::CCommonLibInit():New CPacketFactory OK\n");
 
 	new CCmInitPackets;						//公共协议包
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CCmInitPackets OK\n");
@@ -50,8 +50,8 @@ CCommonLibInit::~CCommonLibInit()
 	delete CCmInitPackets::getSingletonPtr();  //公共协议包
 	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CCmInitPackets OK\n");
 
-	delete g_PacketFactory.getSingletonPtr();  //包工厂
-	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CPacketFactory OK\n");
+	//delete g_PacketFactory.getSingletonPtr();  //包工厂
+	//printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CPacketFactory OK\n");
 
 	Sleep(2000);
 	delete CLogManager2::getSingletonPtr();    //日志

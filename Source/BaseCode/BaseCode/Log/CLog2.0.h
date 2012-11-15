@@ -49,8 +49,11 @@ class CLogManager2;
 #define  LOGE(format, ...)  g_Log2.Write("log\\Err", __FILE__, __LINE__, format, __VA_ARGS__)
 
 //ÍøÂçÄ£¿é
-#define  LOGNE(format, ...)  g_Log2.Write("log\\ErrNet", __FILE__, __LINE__, format, __VA_ARGS__)
 #define  LOGNN(format, ...)  g_Log2.Write("log\\NoticeNet", __FILE__, __LINE__, format, __VA_ARGS__)
+#define  LOGNW(format, ...)  g_Log2.Write("log\\WarningNet", __FILE__, __LINE__, format, __VA_ARGS__)
+#define  LOGNE(format, ...)  g_Log2.Write("log\\ErrNet", __FILE__, __LINE__, format, __VA_ARGS__)
+
+
 
 //ÄÚ´æÄ£¿é
 #define  LOGME(format, ...)  g_Log2.Write("log\\ErrMemery", __FILE__, __LINE__, format, __VA_ARGS__)

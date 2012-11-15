@@ -19,16 +19,7 @@
 enum PACKET_DEFINE1
 {
 	PACKET1_MIN,
-	PACKET1_INNER_NET_LOGIC =0,   //内部通讯，网络层和逻辑层
+	PACKET1_INNER_NET_LOGIC = 0,   //内部通讯，网络层和逻辑层
 
 	PACKET1_MAX = 65536,
 };
-
-enum PACKET_DEFINE2
-{
-	PACKET2_MIN = 0,
-	
-
-	PACKET2_MAX = 65536,
-};
-

@@ -9,7 +9,7 @@
 #include "CNetDriver2.h"
 #include "Clog2.0.h"
 #include "CCmInitPackets.h"
-#include "CPacketFactory.h"
+//#include "CPacketFactory.h"
 
 //#include "CThreadPool.h"
 //#include "CThreadQuit.h"
