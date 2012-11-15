@@ -2,6 +2,8 @@
 #include "CWindowsSlabManager.h"
 #include "CSocketAPI.h"
 #include "GlobalMacro.h"
+#include "mystdio.h"
+
 
 CSocketClient*  MallocSocketClientObject()
 {
@@ -131,7 +133,7 @@ void CSocketClient::InitRecv()
 	InitRecv2();	
 	m_nWSARecvFlag = 0;
 	m_nIOCPEvent = IOCP_EVENT_RECV_BIG;
-	memset(&m_OverlappedRecv, 0, sizeof(m_OverlappedRecv));
+	MEMSET(&m_OverlappedRecv, 0, sizeof(m_OverlappedRecv));
 }
 void CSocketClient::InitRecv1()
 {

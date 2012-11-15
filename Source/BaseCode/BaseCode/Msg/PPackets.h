@@ -26,10 +26,6 @@ const int NET_PACKET_BUFF_SIZE_INNER = 20;
 
 struct NET_PUBLIC_HEAD
 {
-	NET_PUBLIC_HEAD()
-	{
-		memset(this, 0, sizeof(NET_PUBLIC_HEAD));
-	}
 	unsigned short m_nPacketSize;
 	unsigned short m_nPacketDefine1;
 	unsigned short m_nPacketDefine2;	
@@ -58,7 +54,12 @@ private:
 public:
 
 private:
-	char m_Buffer[NET_PACKET_BUFF_SIZE+NET_PACKET_BUFF_SIZE_INNER];
+	union
+	{
+		char m_Buffer[NET_PACKET_BUFF_SIZE+NET_PACKET_BUFF_SIZE_INNER];
+		NET_PUBLIC_HEAD m_PacketHead;
+	};
+	
 };
 
 

@@ -1,5 +1,6 @@
-
 #include "md5.h"
+#include "mystdio.h"
+
 
 std::string CMD5::MD5(char* pBuf, UINT nLength)
 {
@@ -147,7 +148,7 @@ void CMD5::Transform(BYTE Block[64])
 
 CMD5::CMD5()
 {
-	memset( m_lpszBuffer, 0, 64 );
+	MEMSET( m_lpszBuffer, 0, 64 );
 	m_nCount[0] = m_nCount[1] = 0;
 	m_lMD5[0] = MD5_INIT_STATE_0;
 	m_lMD5[1] = MD5_INIT_STATE_1;
@@ -215,7 +216,7 @@ std::string CMD5::Final()
 	for ( int i=0; i < MD5_SIZE; i++) 
 	{
 		char Str[3];
-		memset(Str, 0, 3);
+		MEMSET(Str, 0, 3);
 		if (lpszMD5[i] == 0) 
 		{
 			sprintf_s(Str, 3, "00");

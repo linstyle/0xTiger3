@@ -7,8 +7,8 @@
 
 #include "Singleton.h"
 
-#include "PNLInnerNotic.h"
-#include "PLogin.h"
+//#include "PNLInnerNotic.h"
+//#include "PLogin.h"
 
 class CCmInitPackets:public Singleton<CCmInitPackets>
 {

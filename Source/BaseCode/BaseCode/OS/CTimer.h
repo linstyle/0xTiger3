@@ -185,7 +185,7 @@ private:
 	/*
 		debug,¼ÆÊýÆ÷
 	*/
-	int m_nCount[name_timer::VECS_SIZE][name_timer::TVR_SIZE];
+	int m_Count[name_timer::VECS_SIZE][name_timer::TVR_SIZE];
 };
 
 /*

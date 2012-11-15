@@ -1,4 +1,5 @@
 #include "PInnerTransfer.h"
+#include "CNetKernelThread.h"
 
 PInnerTransfer::PInnerTransfer()
 {

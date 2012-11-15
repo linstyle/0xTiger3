@@ -1,8 +1,8 @@
-
 #include "CLog2.0.h"
 #include <windows.h>
 #include <process.h>
 #include "MTASSERT.h"
+#include "mystdio.h"
 
 initialiseSingleton(CLogManager2);
 
@@ -164,7 +164,7 @@ void CLog2::CloseSaveTerminal()
 //输出到各个终端
 void CLog2::WriteTerminal(LPCSTR pFile, int nLine, const char* format, va_list VaList)
 {
-	memset(m_szLineBuffer, 0 , sizeof(m_szLineBuffer));
+	MEMSET(m_szLineBuffer, 0 , sizeof(m_szLineBuffer));
 	TIME_HHMMSS TimeHHMMSS;
 	int nSprintfLen=0, nSumSprintfLen=0, nPrefixLen=0;
 	char *pszLineBuffer = m_szLineBuffer;

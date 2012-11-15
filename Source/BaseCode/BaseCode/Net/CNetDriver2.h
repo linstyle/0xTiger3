@@ -12,14 +12,13 @@
 
 #pragma  once
 #include "Singleton.h"
-
 #include "CSocketClient.h"
 #include "CSocketServer.h"
 #include "CNetKernelThread.h"
 #include "CNetAcceptThread.h"
 #include "NetCallBackFun.h"
-#include "PNLInnerNotic.h"
 #include "CMyStackWalker.h"
+#include "PPackets.h"
 
 enum
 {

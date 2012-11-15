@@ -13,11 +13,13 @@
 #include <time.h>
 #include <stdio.h>
 
+
+
 struct TIMEW_HHMMSS
 {
 	TIMEW_HHMMSS()
 	{
-		memset(m_Buffer, 0, sizeof(m_Buffer));
+		memset(m_Buffer, 0, sizeof(TIMEW_HHMMSS));
 	}
 	wchar_t m_Buffer[16];
 };
@@ -26,7 +28,7 @@ struct TIME_HHMMSS
 {
 	TIME_HHMMSS()
 	{
-		memset(m_Buffer, 0, sizeof(m_Buffer));
+		memset(m_Buffer, 0, sizeof(TIME_HHMMSS));
 	}
 	char m_Buffer[16];
 };

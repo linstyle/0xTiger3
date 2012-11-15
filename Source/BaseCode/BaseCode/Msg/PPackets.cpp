@@ -1,9 +1,11 @@
 #include "PPackets.h"
 #include "MTASSERT.h"
+#include "mystdio.h"
+
 
 IPackHead::IPackHead()
 {
-	memset(this, 0, sizeof(IPackHead));
+	MEMSET(this, 0, sizeof(IPackHead));
 }
 
 bool IPackHead::InitByCreate(const char* pDesBuffer, unsigned short nBufferSize)
@@ -30,23 +32,17 @@ char* IPackHead::GetPacketBuffer()
 
 unsigned short IPackHead::GetPacketSize()
 {
-	NET_PUBLIC_HEAD* pNetPublicHead = (NET_PUBLIC_HEAD*)m_Buffer;
-	
-	return pNetPublicHead->m_nPacketSize;
+	return m_PacketHead.m_nPacketSize;
 }
 
 unsigned short IPackHead::GetPacketDefine1()
 {
-	NET_PUBLIC_HEAD* pNetPublicHead = (NET_PUBLIC_HEAD*)m_Buffer;
-
-	return pNetPublicHead->m_nPacketDefine1;
+	return m_PacketHead.m_nPacketDefine1;
 }
 
 unsigned short IPackHead::GetPacketDefine2()
 {
-	NET_PUBLIC_HEAD* pNetPublicHead = (NET_PUBLIC_HEAD*)m_Buffer;
-
-	return pNetPublicHead->m_nPacketDefine2;
+	return m_PacketHead.m_nPacketDefine2;
 }
 
 /********************************

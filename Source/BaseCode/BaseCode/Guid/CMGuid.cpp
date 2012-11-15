@@ -1,5 +1,6 @@
-
 #include "CMGuid.h"
+#include "mystdio.h"
+
 
 initialiseSingleton(CMGuid);
 
@@ -7,7 +8,7 @@ void CMGuid::Init(int nBatchFreeGuid, wchar_t *pFileName, GUID_SET* pGuidSet)
 {
 	m_nBatchFreeGuid = nBatchFreeGuid;
 
-	memset(m_strFileName, 0 , sizeof(m_strFileName));
+	MEMSET(m_strFileName, 0 , sizeof(m_strFileName));
 	wcsncpy(m_strFileName, pFileName, name_mguid::LEN_FILE_NAME);
 
 	memcpy(m_nGuidSet, pGuidSet, sizeof(m_nGuidSet));
@@ -123,9 +124,9 @@ void CMGuid::UpdateGuidSet(GAME_IDENTI_TYPE IdentiType, GUID_SET *pGuidSet)
 	wchar_t strKeyName[name_mguid::LEN_KEY_NAME];
 	wchar_t strValueName[name_mguid::LEN_VALUE_NAME];
 
-	memset(strAppName, 0, sizeof(strAppName));
-	memset(strKeyName, 0, sizeof(strKeyName));
-	memset(strValueName, 0, sizeof(strValueName));
+	MEMSET(strAppName, 0, sizeof(strAppName));
+	MEMSET(strKeyName, 0, sizeof(strKeyName));
+	MEMSET(strValueName, 0, sizeof(strValueName));
 
 	swprintf(strAppName, name_mguid::LEN_APP_NAME-4, L"GUID");
 	switch(IdentiType)

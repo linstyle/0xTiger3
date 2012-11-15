@@ -1,6 +1,5 @@
-
 #include "NetCallBackFun.h"
-#include "PNLInnerNotic.h"
+#include "PPackets.h"
 
 initialiseSingleton(CNetBridgeQueue);
 
@@ -50,7 +49,7 @@ int CNetBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 		return -1;
 	}
 
-	IPackHead PackHead(PACKET1_MIN,0);
+	IPackHead PackHead;
 	char BufferPacket[NET_PACKET_BUFF_SIZE]={0};
 
 	//读头部数据大小字段

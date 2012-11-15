@@ -31,37 +31,38 @@ bool CNetDriver2::SetSocketServer(const char* pName, const char* pListenIP, USHO
 
 bool CNetDriver2::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 {
-	IFn(!pConnectIP)
-		return false;
+	//IFn(!pConnectIP)
+	//	return false;
 
-	PNLInnerNotic msgInnerNotic;
-	msgInnerNotic.SetPacketDefine2( PACKET2_LTON_CONNECT_SOCKET);
-	msgInnerNotic.m_nIP = inet_addr(pConnectIP);
-	msgInnerNotic.m_nPort = nConnectPort;
+	//PNLInnerNotic msgInnerNotic;
+	//msgInnerNotic.SetPacketDefine2( PACKET2_LTON_CONNECT_SOCKET);
+	//msgInnerNotic.m_nIP = inet_addr(pConnectIP);
+	//msgInnerNotic.m_nPort = nConnectPort;
 
-	IFn (-1==g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize()))
-	{
-		return false;
-	}
+	//IFn (-1==g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize()))
+	//{
+	//	return false;
+	//}
 
-	m_bHasInit = true;
+	//m_bHasInit = true;
 	return true;
 }
 
 int CNetDriver2::CloseNet(unsigned int nNetKey)
 {
-	PNLInnerNotic msgInnerNotic;
-	msgInnerNotic.SetPacketDefine2( PACKET2_LTON_ERR);
-	msgInnerNotic.SetNetKey(nNetKey);
+	//PNLInnerNotic msgInnerNotic;
+	//msgInnerNotic.SetPacketDefine2( PACKET2_LTON_ERR);
+	//msgInnerNotic.SetNetKey(nNetKey);
 
-	int nResult = g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize());
-	
-	if(-1==nResult)
-	{
-		LOGNE("CNetDriver2::CloseNet,-1==PutNetTaskQueue.nNetKey:%d\n", nNetKey);
-	}
+	//int nResult = g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize());
+	//
+	//if(-1==nResult)
+	//{
+	//	LOGNE("CNetDriver2::CloseNet,-1==PutNetTaskQueue.nNetKey:%d\n", nNetKey);
+	//}
 
-	return nResult;
+	//return nResult;
+	return 0;
 }
 
 int CNetDriver2::SendPacket(IPackHead* pPackHead)
@@ -77,8 +78,8 @@ int CNetDriver2::SendPacket(IPackHead* pPackHead)
 		int nResult = g_NetBridgeQueue.PutNetTaskQueue(pBuffer, nBufferLen);
 		if (-1==nResult)
 		{
-			LOGNE("CNetDriver2::PutPacketStream,-1==PutNetTaskQueue.nNetKey:%d, nDefine1:%d, nDefine2:%d\n", 
-				pPackHead->GetNetKey(), pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());			
+/*			LOGNE("CNetDriver2::PutPacketStream,-1==PutNetTaskQueue.nNetKey:%d, nDefine1:%d, nDefine2:%d\n", 
+				pPackHead->GetNetKey(), pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());	*/		
 		}
 
 		return nResult;

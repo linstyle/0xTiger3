@@ -1,5 +1,5 @@
-
 #include "CTimer.h"
+#include "mystdio.h"
 
 CTimer::CTimer()
 {
@@ -14,7 +14,7 @@ void CTimer::Init()
 
 void CTimer::InitVecs()
 {
-	memset(m_nCount, 0, sizeof(m_nCount));
+	MEMSET(m_Count, 0, sizeof(m_Count));
 	/*
 		初始化好vec的指针
 	*/
@@ -123,7 +123,7 @@ void CTimer::__AddTimer(TIMER_ARG *pTimer)
 		FIFO
 	*/
 	list_add_tail(&pTimer->ListNext, pVec);
-	m_nCount[nX][nY]++;
+	m_Count[nX][nY]++;
 }
 
 void CTimer::__RunTimer()
@@ -205,7 +205,7 @@ void CTimer::TracerMe()
 	printf("tvroot:\n");
 	for(i=0; i<name_timer::TVR_SIZE; ++i)
 	{
-		printf("[%d,%d]:%d ", 0, i, m_nCount[0][i]);
+		printf("[%d,%d]:%d ", 0, i, m_Count[0][i]);
 		if( i%8==0 )
 		{
 			printf("\n");
@@ -217,7 +217,7 @@ void CTimer::TracerMe()
 	{
 		for(j=0; j<name_timer::TVN_SIZE; ++j)
 		{
-			printf("[%d,%d]:%d ", i+1, j, m_nCount[i+1][j]);
+			printf("[%d,%d]:%d ", i+1, j, m_Count[i+1][j]);
 			if( j%8==0 )
 			{
 				printf("\n");

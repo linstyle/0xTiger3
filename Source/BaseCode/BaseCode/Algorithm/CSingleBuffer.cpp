@@ -1,5 +1,5 @@
-
 #include "CSingleBuffer.h"
+#include "mystdio.h"
 
 CSingleBuffer::CSingleBuffer()
 {
@@ -26,7 +26,7 @@ void CSingleBuffer::InitBuffer(int nBytes)
 {
 	m_pBuffer = new char[nBytes];
 	m_nBufferLen = nBytes;
-	memset(m_pBuffer, 0, nBytes*sizeof(char));
+	MEMSET(m_pBuffer, 0, nBytes*sizeof(char));
 
 }
 /*

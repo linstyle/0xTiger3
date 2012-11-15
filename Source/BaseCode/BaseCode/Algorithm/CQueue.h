@@ -114,7 +114,7 @@ private:
 	//for(i=0; i<10; ++i)
 	//{
 	//	char buffer[8];
-	//	memset(buffer, 0, 8);
+	//	MEMSET(buffer, 0, 8);
 	//	sprintf(buffer, "%d", i);
 	//	Queue.PutQueueNode(buffer, strlen(buffer));
 	//}
@@ -123,7 +123,7 @@ private:
 	//for(i=10; i<25; ++i)
 	//{
 	//	char buffer[8];
-	//	memset(buffer, 0, 8);
+	//	MEMSET(buffer, 0, 8);
 	//	sprintf(buffer, "%d", i);
 	//	Queue.PutQueueNode(buffer, strlen(buffer));
 	//}
@@ -133,14 +133,14 @@ private:
 	//{
 	//	int nSize=8;
 	//	char buffer[8];
-	//	memset(buffer, 0, 8);
+	//	MEMSET(buffer, 0, 8);
 	//	Queue.GetQueueUseNode(buffer, &nSize);
 	//}
 
 	//for(i=100; i<105; ++i)
 	//{
 	//	char buffer[8];
-	//	memset(buffer, 0, 8);
+	//	MEMSET(buffer, 0, 8);
 	//	sprintf(buffer, "%d", i);
 	//	Queue.PutQueueNode(buffer, strlen(buffer));
 	//}

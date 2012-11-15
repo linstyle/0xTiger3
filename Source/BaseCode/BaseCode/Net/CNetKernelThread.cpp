@@ -2,7 +2,10 @@
 #include "NetCallBackFun.h"
 #include "GlobalMacro.h"
 #include "CSocketAPI.h"
+#include "mystdio.h"
+#include "PPackets.h"
 #include <process.h>
+
 
 CNetKernelThread::CNetKernelThread()
 {
@@ -260,7 +263,7 @@ void CNetKernelThread::LoopBridgeQueue()
 
 	while (1)
 	{
-		memset(BufferPacket, 0, sizeof(BufferPacket));
+		MEMSET(BufferPacket, 0, sizeof(BufferPacket));
 		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, NET_PACKET_BUFF_SIZE);
 		if (1==nResult || -1==nResult)
 		{
@@ -268,11 +271,11 @@ void CNetKernelThread::LoopBridgeQueue()
 		}
 
 		IPackHead* pPackHead = (IPackHead*)pBuffer;
-		CSocketClient *pSocketClient = GetSocketClientByKey(pPackHead->);
-		IFn(NULL==pSocketClient)
-		{
-			continue;
-		}
+		//CSocketClient *pSocketClient = GetSocketClientByKey(pPackHead->);
+		//IFn(NULL==pSocketClient)
+		//{
+		//	continue;
+		//}
 
 		//逻辑层和网络层内部的包
 		if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
@@ -281,11 +284,11 @@ void CNetKernelThread::LoopBridgeQueue()
 			continue;
 		}
 
-		IFn(-1==pSocketClient->Send(pPackHead->GetPacketBuffer(), pPackHead->GetPacketSize()) )
-		{
-			CloseClientSocket(pSocketClient);
-			continue;
-		}
+		//IFn(-1==pSocketClient->Send(pPackHead->GetPacketBuffer(), pPackHead->GetPacketSize()) )
+		//{
+		//	CloseClientSocket(pSocketClient);
+		//	continue;
+		//}
 	}
 }
 
