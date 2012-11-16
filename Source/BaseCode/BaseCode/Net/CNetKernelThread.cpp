@@ -4,6 +4,7 @@
 #include "CSocketAPI.h"
 #include "mystdio.h"
 #include "PPackets.h"
+#include "CPacketFactory.h"
 #include <process.h>
 
 
@@ -278,11 +279,16 @@ void CNetKernelThread::LoopBridgeQueue()
 		//}
 
 		//逻辑层和网络层内部的包
-		if( PACKET1_INNER_NET_LOGIC==pPackHead->GetPacketDefine1() )
+		if( PACKET1_INNER_NET_LOGIC_QUEUE!=pPackHead->GetPacketDefine1())
 		{
-			pPackHead->Process();
+			//协议送错了？
+			LOGNE("CNetKernelThread::LoopBridgeQueue().PacketDefin1 Err. PDefine1:%d, PDefine2:%d", 
+				pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());
 			continue;
 		}
+
+		g_PacketFactory->ProcessMsg(pPackHead);
+		continue;
 
 		//IFn(-1==pSocketClient->Send(pPackHead->GetPacketBuffer(), pPackHead->GetPacketSize()) )
 		//{

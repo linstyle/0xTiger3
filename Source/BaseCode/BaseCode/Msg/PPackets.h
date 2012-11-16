@@ -39,12 +39,9 @@ class IPackHead
 public:
 	IPackHead();
 
-	//如果是用已经数据新建一个包，需要调用下此函数
-	bool InitByCreate(const char* pDesBuffer, unsigned short nBufferSize);
-
-	//纯虚的处理函数，表示收到包后的处理
-	virtual void Process() = 0;
-	
+	////如果是用已经数据新建一个包，需要调用下此函数
+	//bool InitByCreate(const char* pDesBuffer, unsigned short nBufferSize);
+	//
 	char* GetPacketBuffer();
 	unsigned short GetPacketSize(); 
 	unsigned short GetPacketDefine1();

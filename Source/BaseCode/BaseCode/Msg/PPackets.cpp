@@ -8,22 +8,22 @@ IPackHead::IPackHead()
 	MEMSET(this, 0, sizeof(IPackHead));
 }
 
-bool IPackHead::InitByCreate(const char* pDesBuffer, unsigned short nBufferSize)
-{
-	IFn(!pDesBuffer)
-	{
-		return false;
-	}	
-
-	if( nBufferSize>NET_PACKET_BUFF_SIZE )
-	{
-		return false;
-	}
-
-	memcpy(m_Buffer, pDesBuffer, nBufferSize);
-
-	return true;
-}
+//bool IPackHead::InitByCreate(const char* pDesBuffer, unsigned short nBufferSize)
+//{
+//	IFn(!pDesBuffer)
+//	{
+//		return false;
+//	}	
+//
+//	if( nBufferSize>NET_PACKET_BUFF_SIZE )
+//	{
+//		return false;
+//	}
+//
+//	memcpy(m_Buffer, pDesBuffer, nBufferSize);
+//
+//	return true;
+//}
 
 char* IPackHead::GetPacketBuffer()
 {

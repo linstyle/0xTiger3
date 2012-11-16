@@ -27,8 +27,11 @@ struct P_INNER_TRANSFER:public NET_PUBLIC_HEAD
 *****************************/
 enum
 {
-	D2_INNER_N_TO_L = 0,  //网络层给逻辑层
-	D2_INNER_L_TO_N = 1,  //逻辑层给网络层
+	D2_INNER_N_TO_L_SEND = 0,  //网络层给逻辑层，需要发送出去
+	D2_INNER_N_TO_L_ERR = 1,   //网络层给逻辑层的包，网络层出错
+
+	D2_INNER_L_TO_N_SEND = 2,  //逻辑层给网络层,需要发送出去
+	D2_INNER_L_TO_N_ERR = 3,   //逻辑层给网络层,需要发送出去
 };
 
 /****************************
@@ -62,13 +65,13 @@ private:
 	你的包工厂定义,用于管理收到包后的处理
 	继承IPacketObject和一个单体
 *****************************/
-//class PInnerTransfer:public Singleton<PInnerTransfer>, public IPacketObject
-//{ 
-//public:
-//	PLoginGLObject():IPacketObject(PACKET1_INNER_NET_LOGIC)
-//	{
-//		g_PacketFactory.AddPacketObject(this);
-//	}
-//
-//	virtual int	Execute(IPackHead* pPackHead) ;
-//};
+class PInnerTransfer:public Singleton<PInnerTransfer>, public IPacketObject
+{ 
+public:
+	PLoginGLObject():IPacketObject(PACKET1_INNER_NET_LOGIC_QUEUE)
+	{
+		g_PacketFactory.AddPacketObject(this);
+	}
+
+	virtual int	Execute(IPackHead* pPackHead) ;
+};
