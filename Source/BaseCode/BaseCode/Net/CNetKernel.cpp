@@ -1,43 +1,42 @@
-#include "CNetKernelThread.h"
+#include "CNetKernel.h"
 #include "NetCallBackFun.h"
 #include "GlobalMacro.h"
 #include "CSocketAPI.h"
 #include "mystdio.h"
-#include "PPackets.h"
 #include "CPacketFactory.h"
 #include <process.h>
 
 
-CNetKernelThread::CNetKernelThread()
+CNetKernel::CNetKernel()
 {
 	m_bThreadRun = true;
 	m_hThreadLoop = NULL;
 	m_uThreadLoop = 0;
 }
 
-CNetKernelThread::~CNetKernelThread()
+CNetKernel::~CNetKernel()
 {	
 	Release();
 }
 
-void CNetKernelThread::Init()
+void CNetKernel::Init()
 {
 	INITASSERT(!m_IOCP.Create());
 	InitThread();
 }
 
-void CNetKernelThread::InitThread()
+void CNetKernel::InitThread()
 {
 	m_hThreadLoop = (HANDLE)_beginthreadex(NULL, 0, ThreadLoop, this, 0, &m_uThreadLoop);	
 	INITASSERT( 0== m_hThreadLoop);	
 }
 
-void CNetKernelThread::Release()
+void CNetKernel::Release()
 {
 	ReleaseThread();
 }
 
-void CNetKernelThread::ReleaseThread()
+void CNetKernel::ReleaseThread()
 {
 	m_bThreadRun = false;
 
@@ -48,12 +47,12 @@ void CNetKernelThread::ReleaseThread()
 	CloseHandle(m_hThreadLoop);
 }
 
-CIOCP* CNetKernelThread::GetIOCP()
+CIOCP* CNetKernel::GetIOCP()
 {
 	return &m_IOCP;
 }
 
-bool CNetKernelThread::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect)
+bool CNetKernel::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect)
 {
 	IFn(!pConnectIP)
 		return false;
@@ -71,7 +70,24 @@ bool CNetKernelThread::AddConnectSocket(const char* pConnectIP, USHORT nConnectP
 	return true;
 }
 
-void CNetKernelThread::AddClientSocket(CSocketClient *pSocketClient)
+bool CNetKernel::SendToBuffer(IPacketHead* pPacketHead, unsigned int nNetKey)
+{
+	CSocketClient *pSocketClient = GetSocketClientByKey(nNetKey);
+	IFn(NULL==pSocketClient)
+	{
+		return false;
+	}
+
+	IFn(-1==pSocketClient->Send(pPackHead->GetPacketBuffer(), pPackHead->GetPacketSize()) )
+	{
+		CloseClientSocket(pSocketClient);
+		return false;
+	}	
+
+	return true;
+}
+
+void CNetKernel::AddClientSocket(CSocketClient *pSocketClient)
 {
 	IFn(NULL==pSocketClient)
 	{
@@ -82,7 +98,7 @@ void CNetKernelThread::AddClientSocket(CSocketClient *pSocketClient)
 	m_HashSocketClient.insert(pair<unsigned int, CSocketClient*>(pSocketClient->GetKey(),pSocketClient));
 }
 
-void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogic/*=true*/)
+void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogic/*=true*/)
 {
 	IFn(NULL==pSocketClient)
 	{
@@ -125,7 +141,7 @@ void CNetKernelThread::CloseClientSocket(CSocketClient *pSocketClient,bool bNoti
 	}
 }
 
-bool CNetKernelThread::VerifySocketClientValid(unsigned int nSocketKey)
+bool CNetKernel::VerifySocketClientValid(unsigned int nSocketKey)
 {
 	//判断该对象是否还存在
 	if (m_HashSocketClient.end()==m_HashSocketClient.find(nSocketKey))
@@ -136,7 +152,7 @@ bool CNetKernelThread::VerifySocketClientValid(unsigned int nSocketKey)
 	return true;
 }
 
-CSocketClient* CNetKernelThread::GetSocketClientByKey(unsigned int nSocketKey)
+CSocketClient* CNetKernel::GetSocketClientByKey(unsigned int nSocketKey)
 {
 	HASH_SOCKETCLIENT::iterator ite = m_HashSocketClient.find(nSocketKey);
 
@@ -148,7 +164,7 @@ CSocketClient* CNetKernelThread::GetSocketClientByKey(unsigned int nSocketKey)
 	return ite->second;
 }
 
-void CNetKernelThread::Loop()
+void CNetKernel::Loop()
 {
 	__try
 	{
@@ -164,7 +180,7 @@ void CNetKernelThread::Loop()
 
 }
 
-void CNetKernelThread::LoopIOCP()
+void CNetKernel::LoopIOCP()
 {
 	bool bResult=true;
 
@@ -174,7 +190,7 @@ void CNetKernelThread::LoopIOCP()
 	}	
 }
 
-bool CNetKernelThread::_LoopIOCP()
+bool CNetKernel::_LoopIOCP()
 {
 	BOOL bResult;
 	DWORD dwNumBytes;
@@ -216,7 +232,7 @@ bool CNetKernelThread::_LoopIOCP()
 	return true;
 }
 
-void CNetKernelThread::LoopSendData()
+void CNetKernel::LoopSendData()
 {
 	CSocketClient *pSocketClient;
 	list_head *pListIte;
@@ -233,7 +249,7 @@ void CNetKernelThread::LoopSendData()
 	}//end list_for_each
 }
 
-void CNetKernelThread::LoopConnect()
+void CNetKernel::LoopConnect()
 {
 	list_head *pListIte;
 	list_head *pListIteTemp;
@@ -256,7 +272,7 @@ void CNetKernelThread::LoopConnect()
 	}
 }
 
-void CNetKernelThread::LoopBridgeQueue()
+void CNetKernel::LoopBridgeQueue()
 {
 	int nResult=0;
 	char BufferPacket[NET_PACKET_BUFF_SIZE*2];
@@ -271,34 +287,14 @@ void CNetKernelThread::LoopBridgeQueue()
 			break;
 		}
 
-		IPackHead* pPackHead = (IPackHead*)pBuffer;
-		//CSocketClient *pSocketClient = GetSocketClientByKey(pPackHead->);
-		//IFn(NULL==pSocketClient)
-		//{
-		//	continue;
-		//}
+		IPacketHead* pPackHead = (IPacketHead*)pBuffer;
 
-		//逻辑层和网络层内部的包
-		if( PACKET1_INNER_NET_LOGIC_QUEUE!=pPackHead->GetPacketDefine1())
-		{
-			//协议送错了？
-			LOGNE("CNetKernelThread::LoopBridgeQueue().PacketDefin1 Err. PDefine1:%d, PDefine2:%d", 
-				pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());
-			continue;
-		}
+		g_PacketFactory.ProcessMsg(pPackHead);
 
-		g_PacketFactory->ProcessMsg(pPackHead);
-		continue;
-
-		//IFn(-1==pSocketClient->Send(pPackHead->GetPacketBuffer(), pPackHead->GetPacketSize()) )
-		//{
-		//	CloseClientSocket(pSocketClient);
-		//	continue;
-		//}
 	}
 }
 
-void CNetKernelThread::OnAcceptSocket(CSocketClient *pSocketClient)
+void CNetKernel::OnAcceptSocket(CSocketClient *pSocketClient)
 {
 	IFn(NULL==pSocketClient)
 	{
@@ -319,7 +315,7 @@ void CNetKernelThread::OnAcceptSocket(CSocketClient *pSocketClient)
 	}
 }
 
-void CNetKernelThread::OnRecvSocket(CSocketClient *pSocketClient)
+void CNetKernel::OnRecvSocket(CSocketClient *pSocketClient)
 {
 	IFn(NULL==pSocketClient)
 	{
@@ -337,16 +333,18 @@ void CNetKernelThread::OnRecvSocket(CSocketClient *pSocketClient)
 	}
 }
 
-unsigned int WINAPI CNetKernelThread::ThreadLoop(void* pParam)
+
+
+unsigned int WINAPI CNetKernel::ThreadLoop(void* pParam)
 {
 	IFn(!pParam)
 		return 0;
 
-	CNetKernelThread *pNetDriver=(CNetKernelThread*)pParam;
+	CNetKernel *pNetDriver=(CNetKernel*)pParam;
 	while(pNetDriver->m_bThreadRun)
 	{
 		pNetDriver->Loop();
-		Sleep(200);
+		Sleep(100);
 	}
 
 	return 0;

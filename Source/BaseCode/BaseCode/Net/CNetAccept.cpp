@@ -1,19 +1,19 @@
 
-#include "CNetAcceptThread.h"
+#include "CNetAccept.h"
 #include "CSocketAPI.h"
 #include <process.h>
 
-CNetAcceptThread::CNetAcceptThread()
+CNetAccept::CNetAccept()
 {
 	
 }
 
-CNetAcceptThread::~CNetAcceptThread()
+CNetAccept::~CNetAccept()
 {
 	Release();
 }
 
-void CNetAcceptThread::Init(CIOCP *pIOCP)
+void CNetAccept::Init(CIOCP *pIOCP)
 {
 	m_hThreadAccept = NULL;
 	m_uThreadAccept= 0;
@@ -24,18 +24,18 @@ void CNetAcceptThread::Init(CIOCP *pIOCP)
 	InitThread();
 }
 
-void CNetAcceptThread::Release()
+void CNetAccept::Release()
 {
 	ReleaseThread();
 }
 
-void CNetAcceptThread::InitThread()
+void CNetAccept::InitThread()
 {
 	m_hThreadAccept = (HANDLE)_beginthreadex(NULL, 0, ThreadAccept, this, 0, &m_uThreadAccept);	
 	INITASSERT( 0== m_hThreadAccept);
 }
 
-void CNetAcceptThread::ReleaseThread()
+void CNetAccept::ReleaseThread()
 {
 	m_bThreadRun = false;
 
@@ -46,7 +46,7 @@ void CNetAcceptThread::ReleaseThread()
 	CloseHandle(m_hThreadAccept);
 }
 
-bool CNetAcceptThread::SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
+bool CNetAccept::SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
 {	
 	//服务端套接字，初始化的时候必须成功
 	memcpy(m_SocketServer.m_szName, pName, sizeof(m_SocketServer.m_szName)-1);
@@ -64,7 +64,7 @@ bool CNetAcceptThread::SetSocketServer(const char* pName, const char* pListenIP,
 	return true;
 }
 
-bool CNetAcceptThread::InitAccpetExlpfn(CSocketServer *pSocketServer)
+bool CNetAccept::InitAccpetExlpfn(CSocketServer *pSocketServer)
 {
 	DWORD   bytes;
 	GUID GuidAcceptEx = WSAID_ACCEPTEX;
@@ -85,7 +85,7 @@ bool CNetAcceptThread::InitAccpetExlpfn(CSocketServer *pSocketServer)
 	return true;
 }
 
-bool CNetAcceptThread::IOCPPostConnect(CSocketClient *pSocketClient)
+bool CNetAccept::IOCPPostConnect(CSocketClient *pSocketClient)
 {
 	IFn(!m_pIOCP)
 		return false;
@@ -98,17 +98,17 @@ bool CNetAcceptThread::IOCPPostConnect(CSocketClient *pSocketClient)
 	return true;
 }
 
-CSocketServer* CNetAcceptThread::GetSocketServer()
+CSocketServer* CNetAccept::GetSocketServer()
 {
 	return &m_SocketServer;
 }
 
-unsigned int WINAPI CNetAcceptThread::ThreadAccept(void* pParam)
+unsigned int WINAPI CNetAccept::ThreadAccept(void* pParam)
 {
 	IFn(NULL==pParam)
 		return 0;
 
-	CNetAcceptThread *pNetAccept=(CNetAcceptThread*)pParam;
+	CNetAccept *pNetAccept=(CNetAccept*)pParam;
 	CSocketClient *pSocketClient = NULL;
 	CSocketServer* pSocketServer = pNetAccept->GetSocketServer();
 

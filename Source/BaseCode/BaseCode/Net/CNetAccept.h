@@ -8,11 +8,11 @@
 #include "CSocketClient.h"
 
 
-class CNetAcceptThread
+class CNetAccept
 {
 public:
-	CNetAcceptThread();
-	~CNetAcceptThread();
+	CNetAccept();
+	~CNetAccept();
 	
 	void Init(CIOCP *pIOCP);
 	bool SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);

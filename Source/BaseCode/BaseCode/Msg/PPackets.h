@@ -34,14 +34,11 @@ struct NET_PUBLIC_HEAD
 //头部大小，即unsigned short m_nPacketSize
 const int NET_PACKET_HEAD_SIZE = sizeof(NET_PUBLIC_HEAD);
 
-class IPackHead
+class IPacketHead
 {
 public:
-	IPackHead();
+	IPacketHead();
 
-	////如果是用已经数据新建一个包，需要调用下此函数
-	//bool InitByCreate(const char* pDesBuffer, unsigned short nBufferSize);
-	//
 	char* GetPacketBuffer();
 	unsigned short GetPacketSize(); 
 	unsigned short GetPacketDefine1();
@@ -64,21 +61,20 @@ private:
 /*
 	协议的处理对象基类
 */
-//class IPacketObject
-//{
-//public:
-//	PACKET_DEFINE1 m_nPacketDefine;	
-//
-//private:
-//
-//public:
-//	IPacketObject(PACKET_DEFINE1 nPacketDefine);
-//	PACKET_DEFINE1 GetPacketID();
-//
-//	virtual int	Execute(IPackHead* pPackHead)=0;
-//
-//private:
-//
-//
-//};
+class IPacketObject
+{
+public:
+	IPacketObject(PACKET_DEFINE1 nPacketDefine);
+	PACKET_DEFINE1 GetPacketDefine1();
+
+	virtual void Execute(IPacketHead* pPackHead)=0;
+
+private:
+
+public:
+	PACKET_DEFINE1 m_nPacketDefine;	
+
+private:
+
+};
 

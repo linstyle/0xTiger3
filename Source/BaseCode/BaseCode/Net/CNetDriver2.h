@@ -14,8 +14,8 @@
 #include "Singleton.h"
 #include "CSocketClient.h"
 #include "CSocketServer.h"
-#include "CNetKernelThread.h"
-#include "CNetAcceptThread.h"
+#include "CNetKernel.h"
+#include "CNetAccept.h"
 #include "NetCallBackFun.h"
 #include "CMyStackWalker.h"
 #include "PPackets.h"
@@ -57,7 +57,9 @@ public:
 	int CloseNet(unsigned int nNetKey);
 
 	//int GetPacketStream(char *pBuffer, int nBufferLen);
-	int SendPacket(IPackHead* pPackHead);
+	int SendPacket(IPacketHead* pPackHead);
+
+	CNetKernel* GetNetKerner();
 
 private:
 	/*
@@ -71,8 +73,8 @@ private:
 public:
 
 private:
-	CNetAcceptThread m_NetAcceptThread;
-	CNetKernelThread m_NetKernelThread;
+	CNetAccept m_NetAccept;
+	CNetKernel m_NetKernel;
 
 	bool m_bHasInit;
 

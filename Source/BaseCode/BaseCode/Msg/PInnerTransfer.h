@@ -5,7 +5,8 @@
 
 #pragma  once
 #include "PPackets.h"
-
+#include "CNetDriver2.h"
+#include "CPacketFactory.h"
 /****************************
 	你的结构
 	1)以P_打头
@@ -19,6 +20,14 @@ struct P_INNER_TRANSFER:public NET_PUBLIC_HEAD
 	*/
 	unsigned int m_nNetKey;
 	char* m_NetPacket;
+};
+
+struct P_INNER_TRANSFER_ERR:public NET_PUBLIC_HEAD
+{
+	/*
+		m_nNetKey:网络key
+	*/
+	unsigned int m_nNetKey;
 };
 
 /****************************
@@ -38,16 +47,22 @@ enum
 	你的协议类定义,继承IPackHead
 	1)以P打头
 *****************************/
-class PInnerTransfer:public IPackHead
+class PInnerTransfer:public IPacketHead
 {
 public:
 	PInnerTransfer();
 
-	virtual void Process();
+	unsigned int GetNetKey();
+	P_INNER_TRANSFER* GetInnerTransferPacket();
 
-	//创建一个网络到逻辑层的包
+	//网络到逻辑层
 	bool CreateNtoL(unsigned int nNetKey, const char* pNetPacket, unsigned short nNetPacketSize);
+	bool CreateNtoLErr(unsigned int nNetKey);
 
+	//逻辑到网络层
+	bool CreateLtoN(unsigned int nNetKey, const char* pNetPacket, unsigned short nNetPacketSize);
+	bool CreateLtoNErr(unsigned int nNetKey);
+	
 private:
 
 public:
@@ -65,13 +80,13 @@ private:
 	你的包工厂定义,用于管理收到包后的处理
 	继承IPacketObject和一个单体
 *****************************/
-class PInnerTransfer:public Singleton<PInnerTransfer>, public IPacketObject
+class POInnerTransfer:public IPacketObject
 { 
 public:
-	PLoginGLObject():IPacketObject(PACKET1_INNER_NET_LOGIC_QUEUE)
+	POInnerTransfer():IPacketObject(PACKET1_INNER_NET_LOGIC_QUEUE)
 	{
 		g_PacketFactory.AddPacketObject(this);
 	}
 
-	virtual int	Execute(IPackHead* pPackHead) ;
+	virtual void Execute(IPacketHead* pPackHead) ;
 };

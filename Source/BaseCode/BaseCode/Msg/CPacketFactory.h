@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "Singleton.h"
 #include "PPackets.h"
 
@@ -17,13 +16,19 @@ public:
 	~CPacketFactory();
 
 	void AddPacketObject(IPacketObject* pPacketObject);
-	void ProcessMsg(IPackHead *pPackHead);
+	/*
+		ProcessMsg这里返回值不设置为bool.
+		因为内部的逻辑错误表示值有很多，比如包不符合，一些其他错误等。但是并不表示
+		就要返回false去断开这个连接，其中再做区分太细致。因此是否断开，由内部逻辑
+		自己控制
+	*/
+	void ProcessMsg(IPacketHead *pPackHead);
 
 	IPacketObject* GetPacketObject( int e );
 	
 
 private:
-	IPacketObject* GetPacketObject( IPackHead *pPackHead );
+	IPacketObject* GetPacketObject( IPacketHead *pPackHead );
 
 public:
 

@@ -3,20 +3,21 @@
 	@2012/1/29
 	@网络代码重构，核心运作线程
 */
-
+#pragma once
 #include "CIOCP.h"
 #include "CSocketClient.h"
 #include "CMyStackWalker.h"
 #include "MTASSERT.h"
+#include "PPackets.h"
 #include <map>
 
 using namespace std;
 
-class CNetKernelThread
+class CNetKernel
 {
 public:
-	CNetKernelThread();
-	~CNetKernelThread();
+	CNetKernel();
+	~CNetKernel();
 
 	/*
 		AddClientSocket,Init()顺序要注意，AddClientSocket要在Init()之前，暂时不支持动态添加
@@ -25,7 +26,7 @@ public:
 	CIOCP* GetIOCP();
 
 	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
-
+	bool SendToBuffer(IPacketHead* pPacketHead, unsigned int nNetKey);
 private:
 	static unsigned int WINAPI ThreadLoop(void* pParam);
 

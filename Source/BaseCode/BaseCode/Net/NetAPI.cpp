@@ -18,7 +18,7 @@ void net::Init()
 }
 
 
-int net::SendPacket(IPackHead* pPackHead)
+int net::SendPacket(IPacketHead* pPackHead)
 {
 	return g_NetDriver2.SendPacket(pPackHead);
 }

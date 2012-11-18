@@ -23,7 +23,7 @@ bool CNetDriver2::SetSocketServer(const char* pName, const char* pListenIP, USHO
 	IFn(!pName && pListenIP)
 		return false;
 
-	INITASSERT(!m_NetAcceptThread.SetSocketServer(pName, pListenIP, nListenPort));
+	INITASSERT(!m_NetAccept.SetSocketServer(pName, pListenIP, nListenPort));
 	
 	m_bHasInit = true;
 	return true;
@@ -65,7 +65,7 @@ int CNetDriver2::CloseNet(unsigned int nNetKey)
 	return 0;
 }
 
-int CNetDriver2::SendPacket(IPackHead* pPackHead)
+int CNetDriver2::SendPacket(IPacketHead* pPackHead)
 {
 	IFn(!pPackHead)
 		return -1;
@@ -110,8 +110,8 @@ void CNetDriver2::Init()
 {	
 	INITASSERT(!m_bHasInit);
 
-	m_NetKernelThread.Init();
-	m_NetAcceptThread.Init(m_NetKernelThread.GetIOCP());
+	m_NetKernel.Init();
+	m_NetAccept.Init(m_NetKernel.GetIOCP());
 }
 
 void CNetDriver2::Release()
@@ -142,4 +142,8 @@ void CNetDriver2::ReleaseAllConnect()
 
 }
 
+CNetKernel* CNetDriver2::GetNetKerner()
+{
+	return &m_NetKernel;
+}
 

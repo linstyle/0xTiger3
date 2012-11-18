@@ -12,6 +12,6 @@ namespace net
 	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort);
 	void Init();
 
-	int SendPacket(IPackHead* pPackHead);
+	int SendPacket(IPacketHead* pPackHead);
 	int CloseNet(unsigned int nNetKey);
 };

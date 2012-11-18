@@ -17,8 +17,8 @@ CCommonLibInit::CCommonLibInit()
 	new CPacketFactory;						//包工厂
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CPacketFactory OK\n");
 
-	new CCmInitPackets;						//公共协议包
-	printf("Notic, CCommonLibInit::CCommonLibInit():New CCmInitPackets OK\n");
+	//new CCmInitPackets;						//公共协议包
+	//printf("Notic, CCommonLibInit::CCommonLibInit():New CCmInitPackets OK\n");
 
 	new CNetDriver2;						//网络驱动层
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CNetDriver2 OK\n");
@@ -47,8 +47,8 @@ CCommonLibInit::~CCommonLibInit()
 	delete g_NetDriver2.getSingletonPtr();      //网络驱动层
 	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CNetDriver2 OK\n");
 
-	delete CCmInitPackets::getSingletonPtr();  //公共协议包
-	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CCmInitPackets OK\n");
+	//delete CCmInitPackets::getSingletonPtr();  //公共协议包
+	//printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CCmInitPackets OK\n");
 
 	delete g_PacketFactory.getSingletonPtr();  //包工厂
 	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CPacketFactory OK\n");
