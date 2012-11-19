@@ -16,7 +16,7 @@
 #include "CSocketServer.h"
 #include "CNetKernel.h"
 #include "CNetAccept.h"
-#include "NetCallBackFun.h"
+#include "CNLBridgeQueue.h"
 #include "CMyStackWalker.h"
 #include "PPackets.h"
 

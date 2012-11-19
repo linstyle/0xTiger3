@@ -7,7 +7,7 @@ initialiseSingleton(CNetDriver2);
 CNetDriver2::CNetDriver2()
 {
 	//公共队列
-	new CNetBridgeQueue;
+	new CNLBridgeQueue;
 
 	m_bHasInit = false;
 	InitSocketLib();	
@@ -39,7 +39,7 @@ bool CNetDriver2::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 	//msgInnerNotic.m_nIP = inet_addr(pConnectIP);
 	//msgInnerNotic.m_nPort = nConnectPort;
 
-	//IFn (-1==g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize()))
+	//IFn (-1==g_NLBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize()))
 	//{
 	//	return false;
 	//}
@@ -54,7 +54,7 @@ int CNetDriver2::CloseNet(unsigned int nNetKey)
 	//msgInnerNotic.SetPacketDefine2( PACKET2_LTON_ERR);
 	//msgInnerNotic.SetNetKey(nNetKey);
 
-	//int nResult = g_NetBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize());
+	//int nResult = g_NLBridgeQueue.PutNetTaskQueue((char*)&msgInnerNotic, msgInnerNotic.GetPacketSize());
 	//
 	//if(-1==nResult)
 	//{
@@ -72,17 +72,7 @@ int CNetDriver2::SendPacket(IPacketHead* pPackHead)
 
 	__try
 	{
-		const char* pBuffer = (const char*)pPackHead;
-		int nBufferLen = pPackHead->GetPacketSize();
-
-		int nResult = g_NetBridgeQueue.PutNetTaskQueue(pBuffer, nBufferLen);
-		if (-1==nResult)
-		{
-/*			LOGNE("CNetDriver2::PutPacketStream,-1==PutNetTaskQueue.nNetKey:%d, nDefine1:%d, nDefine2:%d\n", 
-				pPackHead->GetNetKey(), pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());	*/		
-		}
-
-		return nResult;
+		return g_NLBridgeQueue.PutNetTaskQueue(pPackHead);
 	}
 	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
 	{
@@ -97,7 +87,7 @@ int CNetDriver2::SendPacket(IPacketHead* pPackHead)
 //
 //	__try
 //	{
-//		return g_NetBridgeQueue.GetLogicTaskQueue(pBuffer, nBufferLen);
+//		return g_NLBridgeQueue.GetLogicTaskQueue(pBuffer, nBufferLen);
 //	}
 //	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
 //	{
@@ -119,7 +109,7 @@ void CNetDriver2::Release()
 	ReleaseAllConnect();
 	ReleaseSocketLib();
 
-	delete g_NetBridgeQueue.getSingletonPtr();
+	delete g_NLBridgeQueue.getSingletonPtr();
 }
 
 

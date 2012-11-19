@@ -1,9 +1,10 @@
 #include "CNetKernel.h"
-#include "NetCallBackFun.h"
+#include "CNLBridgeQueue.h"
 #include "GlobalMacro.h"
 #include "CSocketAPI.h"
 #include "mystdio.h"
 #include "CPacketFactory.h"
+#include "PInnerTransfer.h"
 #include <process.h>
 
 
@@ -70,7 +71,7 @@ bool CNetKernel::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, b
 	return true;
 }
 
-bool CNetKernel::SendToBuffer(IPacketHead* pPacketHead, unsigned int nNetKey)
+bool CNetKernel::SendToNet(IPacketHead* pPacketHead, unsigned int nNetKey)
 {
 	CSocketClient *pSocketClient = GetSocketClientByKey(nNetKey);
 	IFn(NULL==pSocketClient)
@@ -78,13 +79,26 @@ bool CNetKernel::SendToBuffer(IPacketHead* pPacketHead, unsigned int nNetKey)
 		return false;
 	}
 
-	IFn(-1==pSocketClient->Send(pPackHead->GetPacketBuffer(), pPackHead->GetPacketSize()) )
-	{
-		CloseClientSocket(pSocketClient);
-		return false;
-	}	
+
+	//IFn(-1==pSocketClient->Send(pPacketHead->GetPacketBuffer(), pPacketHead->GetPacketSize()) )
+	//{
+	//	CloseClientSocket(pSocketClient);
+	//	return false;
+	//}	
 
 	return true;
+}
+
+void CNetKernel::CloseClientSocketByNetKey(unsigned int nNetKey)
+{
+	CSocketClient* pSocketClient = GetSocketClientByKey(nNetKey);
+	if(!pSocketClient)
+	{
+		LOGNE("CNetKernel::CloseClientSocketByNetKey.if(!pSocketClient).nNetKey:%d\n",nNetKey);
+		return;
+	}
+
+	CloseClientSocket(pSocketClient);
 }
 
 void CNetKernel::AddClientSocket(CSocketClient *pSocketClient)
@@ -137,7 +151,16 @@ void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogi
 	//通知逻辑层，表示这个错误是网络层主动发起的
 	if(bNotifyLogic)
 	{
+		PInnerTransfer msgInnerTransfer;
+		IFn( !msgInnerTransfer.CreateNtoLErr(pSocketClient->GetKey()) )
+		{
+			return;
+		}
 
+		if (-1==g_NLBridgeQueue.PutNetTaskQueue(&msgInnerTransfer))
+		{
+			LOGNE("CNetKernel::CloseClientSocket.nNetKey:%d\n", pSocketClient->GetKey());
+		}
 	}
 }
 
@@ -281,7 +304,7 @@ void CNetKernel::LoopBridgeQueue()
 	while (1)
 	{
 		MEMSET(BufferPacket, 0, sizeof(BufferPacket));
-		nResult = g_NetBridgeQueue.GetNetTaskQueue(BufferPacket, NET_PACKET_BUFF_SIZE);
+		nResult = g_NLBridgeQueue.GetNetTaskQueue(BufferPacket, NET_PACKET_BUFF_SIZE);
 		if (1==nResult || -1==nResult)
 		{
 			break;
@@ -322,7 +345,7 @@ void CNetKernel::OnRecvSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	while (0==g_NetBridgeQueue.PutLogicTaskQueue(&pSocketClient->m_RecvBuffer))
+	while (0==g_NLBridgeQueue.PutLogicTaskQueue(&pSocketClient->m_RecvBuffer))
 	{
 		
 	}

@@ -1,12 +1,12 @@
 /*
 	@lindp lin_style@foxmail.com   
 	@2012/2/8
-	@网络层的回调函数实现,比如收到网络数据后怎么处理。可以看成网络层和上层的一道粘贴膜。如果想替换网络库，
-	 直接修改该代码即可。
+	@网络层和逻辑层之间的通讯队列
 */
 #pragma  once
 #include "Singleton.h"
 #include "CCircleBuffer.h"
+#include "PPackets.h"
 
 namespace net_config
 {
@@ -16,39 +16,28 @@ namespace net_config
 };
 
 
-class CNetBridgeQueue: public Singleton<CNetBridgeQueue>
+class CNLBridgeQueue: public Singleton<CNLBridgeQueue>
 {
 public:
-	CNetBridgeQueue();
-	~CNetBridgeQueue();
-
 	/*
-	    操作m_ToLogicQueue
-		@GetLogicQueue
-		    返回值 -1:失败  0:成功 1:长度不够
-
-		@PutLogicTaskQueue
-		    返回值 -1:失败  0:成功 1:包长度不够，要继续投递  
+		统一返回值
+		-1:失败  0:成功 1:长度不够
 	*/
+	CNLBridgeQueue();
+	~CNLBridgeQueue();
+
 	int GetLogicTaskQueue(char *pBuffer, int nBufferLen);
 	int PutLogicTaskQueue(CCircleBuffer *pRecvBuffer);	
 	int PutLogicTaskQueue(char *pBuffer, int nBufferLen);
 
-	/*
-		操作m_ToNetQueue
-		@GetNetTaskQueue
-            返回值 -1:失败  0:成功 1:长度不够
-
-		@PutNetQueue:逻辑层来放
-		    返回值 -1:失败  0:成功 1:长度不够
-	*/
 	int GetNetTaskQueue(char *pBuffer, int nBufferLen);
-	int PutNetTaskQueue(const char *pBuffer, int nBufferLen);	
+	int PutNetTaskQueue(IPacketHead* pPacketHead);
 
 private:
 	void Init();
 	void Release();
 
+	int PutNetTaskQueue(const char *pBuffer, int nBufferLen);	
 	int GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen);
 
 public:
@@ -64,4 +53,4 @@ private:
 	CCircleBuffer *m_pNetTaskQueue;
 };
 
-#define g_NetBridgeQueue CNetBridgeQueue::getSingleton()
+#define g_NLBridgeQueue CNLBridgeQueue::getSingleton()

@@ -111,11 +111,13 @@ void POInnerTransfer::Execute(IPacketHead* pPackHead)
 		break;
 
 	case D2_INNER_L_TO_N_SEND:
-		bResult = pNetKernel->SendToBuffer( (IPacketHead*)(pPInnerTransfer->GetInnerTransferPacket()), 
+		bResult = pNetKernel->SendToBufferByNetKey( (IPacketHead*)(pPInnerTransfer->GetInnerTransferPacket()), 
 			pPInnerTransfer->GetNetKey());
 		break;
 
 	case D2_INNER_L_TO_N_ERR:
+		bResult = true;
+		pNetKernel->CloseClientSocketByNetKey(pPInnerTransfer->GetNetKey());
 		break;
 
 	default:

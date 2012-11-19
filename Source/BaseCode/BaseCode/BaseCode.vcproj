@@ -551,6 +551,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Net\CNLBridgeQueue.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Net\CNLBridgeQueue.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Net\CSocketAPI.cpp"
 				>
 			</File>
@@ -572,14 +580,6 @@
 			</File>
 			<File
 				RelativePath=".\Net\CSocketServer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Net\NetCallBackFun.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Net\NetCallBackFun.h"
 				>
 			</File>
 			<Filter

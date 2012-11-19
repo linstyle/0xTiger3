@@ -26,7 +26,8 @@ public:
 	CIOCP* GetIOCP();
 
 	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
-	bool SendToBuffer(IPacketHead* pPacketHead, unsigned int nNetKey);
+	bool SendToNet(IPacketHead* pPacketHead, unsigned int nNetKey);
+	void CloseClientSocketByNetKey(unsigned int nNetKey);
 private:
 	static unsigned int WINAPI ThreadLoop(void* pParam);
 
@@ -59,8 +60,8 @@ private:
 		VerifySocketClientValid
 		检测CSocketClient对象是否有效
 	*/
-	void AddClientSocket(CSocketClient *pSocketClient);
-	void CloseClientSocket(CSocketClient *pSocketClient, bool bNotifyLogic=true);
+	void AddClientSocket(CSocketClient* pSocketClient);
+	void CloseClientSocket(CSocketClient* pSocketClient, bool bNotifyLogic=true);
 	bool VerifySocketClientValid(unsigned int nSocketKey);
 	CSocketClient* GetSocketClientByKey(unsigned int nSocketKey);
 	/*
@@ -69,8 +70,8 @@ private:
 		OnRecvSocket:当套接字收到数据
 	*/
 	bool _LoopIOCP();
-	void OnAcceptSocket(CSocketClient *pSocketClient);
-	void OnRecvSocket(CSocketClient *pSocketClient);
+	void OnAcceptSocket(CSocketClient* pSocketClient);
+	void OnRecvSocket(CSocketClient* pSocketClient);
 public:
 
 private:

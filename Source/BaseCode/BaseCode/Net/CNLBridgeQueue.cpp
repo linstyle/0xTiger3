@@ -1,19 +1,19 @@
-#include "NetCallBackFun.h"
-#include "PPackets.h"
+#include "CNLBridgeQueue.h"
 
-initialiseSingleton(CNetBridgeQueue);
 
-CNetBridgeQueue::CNetBridgeQueue()
+initialiseSingleton(CNLBridgeQueue);
+
+CNLBridgeQueue::CNLBridgeQueue()
 {
 	Init();
 }
 
-CNetBridgeQueue::~CNetBridgeQueue()
+CNLBridgeQueue::~CNLBridgeQueue()
 {
 	Release();
 }
 
-void CNetBridgeQueue::Init()
+void CNLBridgeQueue::Init()
 {
 	m_pLogicTaskQueue = new CCircleBuffer;
 	m_pNetTaskQueue = new CCircleBuffer;
@@ -21,7 +21,7 @@ void CNetBridgeQueue::Init()
 	m_pNetTaskQueue->Init(net_config::DEFAULT_BUFFER_LEN);
 	m_pLogicTaskQueue->Init(net_config::DEFAULT_BUFFER_LEN);
 }
-void CNetBridgeQueue::Release()
+void CNLBridgeQueue::Release()
 {
 //#pragma  todo 判断是否有残余的包
 	delete m_pLogicTaskQueue;
@@ -29,7 +29,7 @@ void CNetBridgeQueue::Release()
 }
 
 
-int CNetBridgeQueue::GetLogicTaskQueue(char *pBuffer, int nBufferLen)
+int CNLBridgeQueue::GetLogicTaskQueue(char *pBuffer, int nBufferLen)
 {
 	IF(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
@@ -42,7 +42,7 @@ int CNetBridgeQueue::GetLogicTaskQueue(char *pBuffer, int nBufferLen)
 /*
 	网络层来存放
 */
-int CNetBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
+int CNLBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 {
 	IFn(NULL==pRecvBuffer)
 	{
@@ -76,7 +76,7 @@ int CNetBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 	return 0;
 }
 
-int CNetBridgeQueue::PutLogicTaskQueue(char *pBuffer, int nBufferLen)
+int CNLBridgeQueue::PutLogicTaskQueue(char *pBuffer, int nBufferLen)
 {
 	IFn(NULL==pBuffer)
 	{
@@ -86,7 +86,7 @@ int CNetBridgeQueue::PutLogicTaskQueue(char *pBuffer, int nBufferLen)
 	return m_pLogicTaskQueue->WriteBufferAtom(pBuffer, nBufferLen);
 }
 
-int CNetBridgeQueue::GetNetTaskQueue(char *pBuffer, int nBufferLen)
+int CNLBridgeQueue::GetNetTaskQueue(char *pBuffer, int nBufferLen)
 {
 	IFn(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
@@ -95,7 +95,23 @@ int CNetBridgeQueue::GetNetTaskQueue(char *pBuffer, int nBufferLen)
 
 	return GetQueue(m_pNetTaskQueue, pBuffer, nBufferLen);
 }
-int CNetBridgeQueue::PutNetTaskQueue(const char *pBuffer, int nBufferLen)
+
+int CNLBridgeQueue::PutNetTaskQueue(IPacketHead* pPacketHead)
+{
+	char* pBuffer = (char*)(pPacketHead);
+	int nBufferLen = pPacketHead->GetPacketSize();
+
+	int nResult = PutNetTaskQueue(pBuffer, nBufferLen);
+	if(-1==nResult)
+	{
+		LOGNE("CNLBridgeQueue::PutNetTaskQueue,-1==PutNetTaskQueue.nDefine1:%d, nDefine2:%d\n", 
+			pPacketHead->GetPacketDefine1(), pPacketHead->GetPacketDefine2());
+	}
+
+	return nResult;
+}
+
+int CNLBridgeQueue::PutNetTaskQueue(const char *pBuffer, int nBufferLen)
 {
 	IF(NULL==pBuffer)
 	{
@@ -105,7 +121,7 @@ int CNetBridgeQueue::PutNetTaskQueue(const char *pBuffer, int nBufferLen)
 	return m_pNetTaskQueue->WriteBufferAtom(pBuffer, nBufferLen);
 }
 
-int CNetBridgeQueue::GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen)
+int CNLBridgeQueue::GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen)
 {
 	int nPacketIdent=0;
 
@@ -117,7 +133,7 @@ int CNetBridgeQueue::GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer,
 
 	IFn(PackHead.GetPacketSize()>nBufferLen)
 	{
-		LOGNE("Err, CNetBridgeQueue::GetQueue. PacketID1:%d, PacketID2:%d, PacketSize:%d\n", 
+		LOGNE("CNLBridgeQueue::GetQueue. PacketID1:%d, PacketID2:%d, PacketSize:%d\n", 
 			PackHead.GetPacketDefine1(), PackHead.GetPacketDefine2(), PackHead.GetPacketSize());
 		return 1;
 	}
