@@ -37,21 +37,14 @@ public:
 	void WriteBufferFlush(int nWriteLenBytes);
 
 	char* GetReadBuffer(int *pWishLenBytes);
-	int TryReadBuffer(char *pBuffer, int nReadLenBytes);
+	bool TryReadBuffer(char *pBuffer, int nReadLenBytes);
 	void ReadBufferFlush(int nReadLenBytes);
 
 	/*
 		二类API名字，加以atom区分，表示是个原子操作：支持多线程
 	*/
-	/*
-		WriteBuffer
-		返回值为-1或者0， 要么写成功，要么失败
-
-		ReadBufferAtom
-		返回值为-1或者0， 要么读成功，要么失败
-	*/
-	int WriteBufferAtom(const char* pBuffer, int nWriteLenBytes);
-	int ReadBufferAtom(char* pBuffer, int nReadLenBytes);
+	bool WriteBufferAtom(const char* pBuffer, int nWriteLenBytes);
+	bool ReadBufferAtom(char* pBuffer, int nReadLenBytes);
 
 
 	int GetUseLength();

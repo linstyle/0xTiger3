@@ -29,7 +29,7 @@ void CNLBridgeQueue::Release()
 }
 
 
-int CNLBridgeQueue::GetLogicTaskQueue(char *pBuffer, int nBufferLen)
+int CNLBridgeQueue::GetFromLogicQueue(char *pBuffer, int nBufferLen)
 {
 	IF(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
@@ -42,7 +42,7 @@ int CNLBridgeQueue::GetLogicTaskQueue(char *pBuffer, int nBufferLen)
 /*
 	网络层来存放
 */
-int CNLBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
+int CNLBridgeQueue::PutToLogicQueue(CCircleBuffer *pRecvBuffer)
 {
 	IFn(NULL==pRecvBuffer)
 	{
@@ -59,7 +59,7 @@ int CNLBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 	}
 
 	//打包投入到m_ToLogicQueue
-	if( -1==m_pLogicTaskQueue->WriteBufferAtom(BufferPacket, PackHead.GetPacketSize()) )
+	if( !m_pLogicTaskQueue->WriteBufferAtom(BufferPacket, PackHead.GetPacketSize()) )
 	{
 		return 1;
 	}
@@ -76,66 +76,49 @@ int CNLBridgeQueue::PutLogicTaskQueue(CCircleBuffer *pRecvBuffer)
 	return 0;
 }
 
-int CNLBridgeQueue::PutLogicTaskQueue(char *pBuffer, int nBufferLen)
-{
-	IFn(NULL==pBuffer)
-	{
-		return -1;
-	}
 
-	return m_pLogicTaskQueue->WriteBufferAtom(pBuffer, nBufferLen);
-}
-
-int CNLBridgeQueue::GetNetTaskQueue(char *pBuffer, int nBufferLen)
+bool CNLBridgeQueue::GetFromNetQueue(char *pBuffer, int nBufferLen)
 {
 	IFn(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
-		return -1;
+		return false;
 	}
 
 	return GetQueue(m_pNetTaskQueue, pBuffer, nBufferLen);
 }
 
-int CNLBridgeQueue::PutNetTaskQueue(IPacketHead* pPacketHead)
+bool CNLBridgeQueue::PutToNetQueue(IPacketHead* pPacketHead)
 {
 	char* pBuffer = (char*)(pPacketHead);
 	int nBufferLen = pPacketHead->GetPacketSize();
 
-	int nResult = PutNetTaskQueue(pBuffer, nBufferLen);
-	if(-1==nResult)
+	if (!m_pNetTaskQueue->WriteBufferAtom(pBuffer, nBufferLen))
 	{
 		LOGNE("CNLBridgeQueue::PutNetTaskQueue,-1==PutNetTaskQueue.nDefine1:%d, nDefine2:%d\n", 
 			pPacketHead->GetPacketDefine1(), pPacketHead->GetPacketDefine2());
-	}
 
-	return nResult;
+		return false;
+	}
+	
+	return true;
 }
 
-int CNLBridgeQueue::PutNetTaskQueue(const char *pBuffer, int nBufferLen)
-{
-	IF(NULL==pBuffer)
-	{
-		return -1;
-	}
 
-	return m_pNetTaskQueue->WriteBufferAtom(pBuffer, nBufferLen);
-}
-
-int CNLBridgeQueue::GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen)
+bool CNLBridgeQueue::GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen)
 {
 	int nPacketIdent=0;
 
 	IPacketHead PackHead;
-	if (-1==pSrcCircleBuffer->TryReadBuffer((char*)&PackHead, NET_PACKET_HEAD_SIZE) )
+	if (!pSrcCircleBuffer->TryReadBuffer((char*)&PackHead, NET_PACKET_HEAD_SIZE) )
 	{
-		return 1;
+		return false;
 	}
 
 	IFn(PackHead.GetPacketSize()>nBufferLen)
 	{
 		LOGNE("CNLBridgeQueue::GetQueue. PacketID1:%d, PacketID2:%d, PacketSize:%d\n", 
 			PackHead.GetPacketDefine1(), PackHead.GetPacketDefine2(), PackHead.GetPacketSize());
-		return 1;
+		return false;
 	}
 
 	return pSrcCircleBuffer->ReadBufferAtom(pDstBuffer, PackHead.GetPacketSize());

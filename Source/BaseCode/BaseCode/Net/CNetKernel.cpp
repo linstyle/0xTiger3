@@ -71,7 +71,7 @@ bool CNetKernel::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, b
 	return true;
 }
 
-bool CNetKernel::SendToNet(IPacketHead* pPacketHead, unsigned int nNetKey)
+bool CNetKernel::SendToBufferByNetKey(IPacketHead* pPacketHead, unsigned int nNetKey)
 {
 	CSocketClient *pSocketClient = GetSocketClientByKey(nNetKey);
 	IFn(NULL==pSocketClient)
@@ -80,11 +80,11 @@ bool CNetKernel::SendToNet(IPacketHead* pPacketHead, unsigned int nNetKey)
 	}
 
 
-	//IFn(-1==pSocketClient->Send(pPacketHead->GetPacketBuffer(), pPacketHead->GetPacketSize()) )
-	//{
-	//	CloseClientSocket(pSocketClient);
-	//	return false;
-	//}	
+	IFn(-1==pSocketClient->Send(pPacketHead->GetPacketBuffer(), pPacketHead->GetPacketSize()) )
+	{
+		CloseClientSocket(pSocketClient);
+		return false;
+	}	
 
 	return true;
 }
@@ -98,7 +98,7 @@ void CNetKernel::CloseClientSocketByNetKey(unsigned int nNetKey)
 		return;
 	}
 
-	CloseClientSocket(pSocketClient);
+	CloseClientSocket(pSocketClient, false);
 }
 
 void CNetKernel::AddClientSocket(CSocketClient *pSocketClient)
@@ -108,6 +108,7 @@ void CNetKernel::AddClientSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
+	m_lConnect.Add(&pSocketClient->m_lNode);
 	m_lSocketClient.Add(&pSocketClient->m_lNode);
 	m_HashSocketClient.insert(pair<unsigned int, CSocketClient*>(pSocketClient->GetKey(),pSocketClient));
 }

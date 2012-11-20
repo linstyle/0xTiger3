@@ -10,9 +10,8 @@
 
 namespace net_config
 {
-	//按百兆网卡计算，15MB
+	//暂定15MB.根据实际测试时，每秒吞吐量*可容忍延迟秒数
 	const int DEFAULT_BUFFER_LEN = 1024*15*1024; 
-
 };
 
 
@@ -20,25 +19,22 @@ class CNLBridgeQueue: public Singleton<CNLBridgeQueue>
 {
 public:
 	/*
-		统一返回值
-		-1:失败  0:成功 1:长度不够
+		无论GET,SET都保证取回或写入一个完整的包.
 	*/
 	CNLBridgeQueue();
 	~CNLBridgeQueue();
 
-	int GetLogicTaskQueue(char *pBuffer, int nBufferLen);
-	int PutLogicTaskQueue(CCircleBuffer *pRecvBuffer);	
-	int PutLogicTaskQueue(char *pBuffer, int nBufferLen);
+	bool GetFromLogicQueue(char *pBuffer, int nBufferLen);
+	bool PutToLogicQueue(CCircleBuffer *pRecvBuffer);	
 
-	int GetNetTaskQueue(char *pBuffer, int nBufferLen);
-	int PutNetTaskQueue(IPacketHead* pPacketHead);
+	bool GetFromNetQueue(char *pBuffer, int nBufferLen);
+	bool PutToNetQueue(IPacketHead* pPacketHead);
 
 private:
 	void Init();
 	void Release();
 
-	int PutNetTaskQueue(const char *pBuffer, int nBufferLen);	
-	int GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen);
+	bool GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen);
 
 public:
 

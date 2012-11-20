@@ -26,7 +26,7 @@ public:
 	CIOCP* GetIOCP();
 
 	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
-	bool SendToNet(IPacketHead* pPacketHead, unsigned int nNetKey);
+	bool SendToBufferByNetKey(IPacketHead* pPacketHead, unsigned int nNetKey);
 	void CloseClientSocketByNetKey(unsigned int nNetKey);
 private:
 	static unsigned int WINAPI ThreadLoop(void* pParam);

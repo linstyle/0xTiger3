@@ -13,5 +13,5 @@ namespace net
 	void Init();
 
 	int SendPacket(IPacketHead* pPackHead);
-	int CloseNet(unsigned int nNetKey);
+	bool CloseNet(unsigned int nNetKey);
 };

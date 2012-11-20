@@ -24,7 +24,7 @@ int net::SendPacket(IPacketHead* pPackHead)
 }
 
 
-int net::CloseNet(unsigned int nNetKey)
+bool net::CloseNet(unsigned int nNetKey)
 {
 	return g_NetDriver2.CloseNet(nNetKey);
 }

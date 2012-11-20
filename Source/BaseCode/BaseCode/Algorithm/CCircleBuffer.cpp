@@ -49,7 +49,7 @@ char* CCircleBuffer::GetReadBuffer(int *pWishLenBytes)
 	return pBuffer;
 }
 
-int CCircleBuffer::TryReadBuffer(char *pBuffer, int nReadLenBytes)
+bool CCircleBuffer::TryReadBuffer(char *pBuffer, int nReadLenBytes)
 {
 	int nRead1 = m_nReadIndex;
 	int nRead2 = (m_nReadIndex+1) & 0x1;
@@ -59,7 +59,7 @@ int CCircleBuffer::TryReadBuffer(char *pBuffer, int nReadLenBytes)
 	int nLen2 = m_SingleBuffer[nRead2].GetUseLength();
 	if( (nLen1+nLen2)<nReadLenBytes )
 	{
-		return -1;
+		return false;
 	}
 
 	nLen2 = nReadLenBytes-nLen1;
@@ -78,10 +78,10 @@ int CCircleBuffer::TryReadBuffer(char *pBuffer, int nReadLenBytes)
 
 goto_read_end:
 
-	return 0;	
+	return true;	
 }
 
-int CCircleBuffer::WriteBufferAtom(const char* pBuffer, int nWriteLenBytes)
+bool CCircleBuffer::WriteBufferAtom(const char* pBuffer, int nWriteLenBytes)
 {
 	m_LockWrite.Lock();
 
@@ -94,7 +94,7 @@ int CCircleBuffer::WriteBufferAtom(const char* pBuffer, int nWriteLenBytes)
 	if( (nLen1+nLen2)<nWriteLenBytes )
 	{
 		m_LockWrite.UnLock();
-		return -1;
+		return false;
 	}
 
 	nLen2 = nWriteLenBytes-nLen1;
@@ -115,11 +115,11 @@ goto_write_end:
 	WriteBufferFlush(nWriteLenBytes);
 	m_LockWrite.UnLock();
 	
-	return 0;
+	return true;
 }
 
 
-int CCircleBuffer::ReadBufferAtom(char *pBuffer, int nReadLenBytes)
+bool CCircleBuffer::ReadBufferAtom(char *pBuffer, int nReadLenBytes)
 {
 	m_LockRead.Lock();
 
@@ -132,7 +132,7 @@ int CCircleBuffer::ReadBufferAtom(char *pBuffer, int nReadLenBytes)
 	if( (nLen1+nLen2)<nReadLenBytes )
 	{
 		m_LockRead.UnLock();
-		return -1;
+		return false;
 	}
 
 	nLen2 = nReadLenBytes-nLen1;
@@ -153,7 +153,7 @@ goto_read_end:
 	ReadBufferFlush(nReadLenBytes);
 	m_LockRead.UnLock();
 
-	return 0;
+	return true;
 }
 
 void CCircleBuffer::WriteBufferFlush(int nWriteLenBytes)

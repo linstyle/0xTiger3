@@ -8,6 +8,9 @@
 	driver层调配着AcceptThread,KernelThread,NetCallBack三个组件，
 	类的public也是对外开放的接口,对逻辑层统一暴露的API,其实就是封装了PNLInnerNotic协议。
 	只是我觉得直接提供函数更友好点
+	@注意 2012/11/20
+	driver层是给逻辑层调用的。即driver层中如果想和网路层通讯，都要通过发消息的形式。除了
+	在初始化时调用SetSocketServer，AddConnectSocket这两个函数
 */
 
 #pragma  once
@@ -25,13 +28,7 @@ enum
 	NET_ENUM_CONNECT,
 	NET_ENUM_DISCONNECT
 };
-/*
-	线程； 接收线程，工作线程；
-	连接对象管理；
-	内存池管理；
-	打包格式；
-	写数据流队列，写事件队列；
-*/
+
 class CNetDriver2: public Singleton<CNetDriver2>
 {
 public:
@@ -54,10 +51,10 @@ public:
 		@通知网络层，逻辑层有错误发生
 		@nNetKey:网络层传递给逻辑岑的标识
 	*/
-	int CloseNet(unsigned int nNetKey);
+	bool CloseNet(unsigned int nNetKey);
 
 	//int GetPacketStream(char *pBuffer, int nBufferLen);
-	int SendPacket(IPacketHead* pPackHead);
+	bool SendPacket(IPacketHead* pPackHead);
 
 	CNetKernel* GetNetKerner();
 
