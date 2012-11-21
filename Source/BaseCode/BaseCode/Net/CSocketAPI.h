@@ -30,7 +30,7 @@ public:
 		返回值:   -1 失败
 				  >=0 成功，或者是接收/发送的字节数
 	*/
-	static int ConnectNonb(int fdNonb, const sockaddr *pConnectAddr, int nConnectAddrSize, int nSec);
+	static int ConnectNonb(SOCKET fdNonb, const sockaddr *pConnectAddr, int nConnectAddrSize, int nSec);
 	static int RecvnTCP(SOCKET fd, char* pRecvBuffer, int nRecvLen);
 	static int SendnTCP(SOCKET fd, const char* pSendBuffer, int nSendLen);
 

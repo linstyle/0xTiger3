@@ -51,7 +51,7 @@ TIME_HHMMSS* CTime::GetHHMMSS(TIME_HHMMSS *pTimeHHMMSS)
 	_time64( &szClock );
 	localtime_s(&TM,  &szClock );
 
-	_snprintf(pTimeHHMMSS->m_Buffer, sizeof(pTimeHHMMSS->m_Buffer)-4,
+	_snprintf_s(pTimeHHMMSS->m_Buffer, sizeof(pTimeHHMMSS->m_Buffer)-4,
 		"%02d:%02d:%02d",  TM.tm_hour, TM.tm_min, TM.tm_sec);
 	
 	return pTimeHHMMSS;

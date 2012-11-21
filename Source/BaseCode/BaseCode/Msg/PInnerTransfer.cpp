@@ -27,13 +27,8 @@ P_INNER_TRANSFER* PInnerTransfer::GetInnerTransferPacket()
 }
 
 
-bool PInnerTransfer::CreateNtoL(unsigned int nNetKey, const char* pNetPacket, unsigned short nNetPacketSize)
+bool PInnerTransfer::CreateNtoL(unsigned int nNetKey)
 {
-	if (nNetPacketSize > NET_PACKET_BUFF_SIZE)
-	{
-		return false;
-	}
-
 	m_pInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
 	m_pInnerTransfer->m_nPacketDefine2 = D2_INNER_N_TO_L_SEND;
 	m_pInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER);
@@ -54,9 +49,9 @@ bool PInnerTransfer::CreateNtoLErr(unsigned int nNetKey)
 	return true;
 }
 
-bool PInnerTransfer::CreateLtoN(unsigned int nNetKey, const char* pNetPacket, unsigned short nNetPacketSize)
+bool PInnerTransfer::CreateLtoN(unsigned int nNetKey, const char* pLogicPacket, unsigned short nLogicPacketSize)
 {
-	if (nNetPacketSize > NET_PACKET_BUFF_SIZE)
+	if (nLogicPacketSize > NET_PACKET_BUFF_SIZE)
 	{
 		return false;
 	}
@@ -66,6 +61,7 @@ bool PInnerTransfer::CreateLtoN(unsigned int nNetKey, const char* pNetPacket, un
 	m_pInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER);
 
 	m_pInnerTransfer->m_nNetKey = nNetKey;
+	memcpy(GetPacketBuffer(), pLogicPacket, nLogicPacketSize);
 
 	return true;
 }

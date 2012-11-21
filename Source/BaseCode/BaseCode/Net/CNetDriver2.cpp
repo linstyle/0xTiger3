@@ -59,7 +59,7 @@ bool CNetDriver2::SendPacket(IPacketHead* pPackHead)
 
 	__try
 	{
-		return g_NLBridgeQueue.PutNetTaskQueue(pPackHead);
+		return g_NLBridgeQueue.PutToNetQueue(pPackHead);
 	}
 	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
 	{

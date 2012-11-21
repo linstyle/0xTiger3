@@ -6,6 +6,25 @@
 
 initialiseSingleton(CLogManager2);
 
+void CLogManager2::Init()
+{
+	/*
+		对各个日志实例都初始化一遍,保证都创建
+	*/
+	LOGN("");
+	LOGW("");
+	LOGE("");
+
+	LOGNN("");
+	LOGNW("");
+	LOGNE("");
+
+	LOGMN("");
+	LOGME("");
+	LOGU1("");
+	StartThread();
+}
+
 CLog2::CLog2()
 {
 	m_hFile = NULL;
@@ -21,7 +40,7 @@ CLog2::~CLog2()
 
 bool CLog2::Init(const char* pSaveFileName)
 {
-	strncpy(m_szFileTitleName, pSaveFileName,  name_log2::SAVE_FILE_TITLE_NAME_LEN-1);
+	strncpy_s(m_szFileTitleName, pSaveFileName,  name_log2::SAVE_FILE_TITLE_NAME_LEN-1);
 
 	InitCircleBuffer();
 
@@ -59,7 +78,7 @@ void CLog2::FlushWrite()
 		每次按36KB刷
 	*/
 	const int FLUSH_BYTES = 36*1024;
-	int nFlushBytes = 0, nHasFlushBytes=0;
+	unsigned int nFlushBytes = 0, nHasFlushBytes=0;
 
 	int nCircleBufferReadLen=0;
 	char *pTempBuffer = m_CircleBuffer.GetReadBuffer(&nCircleBufferReadLen);
@@ -112,9 +131,14 @@ void CLog2::ReCreateSaveTerminal()
 
 bool CLog2::CreateSaveTerminal()
 {
+	if (!m_hFile)
+	{
+		return false;
+	}
+
 	//取到文件名
 	m_nFileNameHour = CTime::GetHH();
-	_snprintf(m_szFileName, sizeof(m_szFileName)-1, "%s%d.log", m_szFileTitleName,
+	_snprintf_s(m_szFileName, sizeof(m_szFileName)-1, "%s%d.log", m_szFileTitleName,
 		CTime::GetMMDDHH() );
 
 	//创建文件夹
@@ -126,7 +150,7 @@ bool CLog2::CreateSaveTerminal()
 		char c=*pPathNameFlag;
 		*pPathNameFlag='\0';
 
-		strncpy(szPathName, m_szFileTitleName, 32);
+		strncpy_s(szPathName, m_szFileTitleName, 32);
 		
 		if ( !CreateDirectoryA(pszPathName, NULL) )
 		{
@@ -141,13 +165,12 @@ bool CLog2::CreateSaveTerminal()
 	}
 
 	//创建文件
-	m_hFile = fopen(m_szFileName, "a+");
-	if( NULL == m_hFile )
+	if (0!=fopen_s(&m_hFile, m_szFileName, "a+"))
 	{
 		printf("Err, CLog2::CreateSaveTerminal():ErrID(%d)\n", GetLastError());
 		return false;
 	}
-
+	
 	return true;
 }
 
@@ -172,14 +195,16 @@ void CLog2::WriteTerminal(LPCSTR pFile, int nLine, const char* format, va_list V
 	CTime::GetHHMMSS(&TimeHHMMSS);
 
 	//一些固定的前缀内容
-	nSprintfLen = _snprintf(pszLineBuffer, name_log2::LINE_BUFFER_LEN, "%s %s:%d ", TimeHHMMSS.m_Buffer, pFile, nLine);
+	nSprintfLen = _snprintf(pszLineBuffer, name_log2::LINE_BUFFER_LEN, 
+		"%s %s:%d ", TimeHHMMSS.m_Buffer, pFile, nLine);
+
 	if (-1!=nSprintfLen)
 	{
 		nPrefixLen=nSprintfLen;
 		nSumSprintfLen+=nSprintfLen;
 	}
 	//具体的内容
-	nSprintfLen = _vsnprintf(pszLineBuffer+nSumSprintfLen, name_log2::LINE_BUFFER_LEN-nSumSprintfLen, format, VaList);
+	nSprintfLen = _vsnprintf_s(pszLineBuffer+nSumSprintfLen, name_log2::LINE_BUFFER_LEN-nSumSprintfLen, format, VaList);
 	if (-1!=nSprintfLen)
 	{
 		nSumSprintfLen+=nSprintfLen;
@@ -197,7 +222,7 @@ void CLog2::WriteTerminal(LPCSTR pFile, int nLine, const char* format, va_list V
 
 	if (name_log2::PUT_MASK & name_log2::PUT_MASK_HD)
 	{
-		if ( -1==m_CircleBuffer.WriteBufferAtom(m_szLineBuffer, nSumSprintfLen) )
+		if ( !m_CircleBuffer.WriteBufferAtom(m_szLineBuffer, nSumSprintfLen) )
 		{
 			LOGW("Warning, CLog2::WriteTerminal:m_CircleBuffer.WriteBuffer, nSumSprintfLen(%d)\n", nSumSprintfLen);
 		}
@@ -232,25 +257,6 @@ CLogManager2::CLogManager2()
 CLogManager2::~CLogManager2()
 {
 	Release();
-}
-
-void CLogManager2::Init()
-{
-	/*
-		对各个日志实例都初始化一遍,保证都创建
-	*/
-	LOGN("");
-	LOGW("");
-	LOGE("");
-
-	LOGNN("");
-	LOGNW("");
-	LOGNE("");
-
-	LOGMN("");
-	LOGME("");
-	LOGU1("");
-	StartThread();
 }
 
 void CLogManager2::Release()
@@ -323,7 +329,7 @@ unsigned int WINAPI CLogManager2::ThreadWrite(void* param)
 			pLog2->FlushWrite();
 		}
 
-		Sleep(500);
+		Sleep(300);
 	}
 
 	return 0;

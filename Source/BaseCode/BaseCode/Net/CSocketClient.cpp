@@ -54,7 +54,9 @@ CSocketClient::~CSocketClient()
 
 void CSocketClient::Init()
 {
-	m_nIP = m_nPort = m_nSocket = 0;
+	m_nIP = 0;
+	m_nPort = 0;
+	m_nSocket = 0;
 
 	m_RecvBuffer.Init(socket_circle_config::RECV_CIRCLE_LEN);
 	m_SendBuffer.Init(socket_circle_config::SEND_CIRCLE_LEN);

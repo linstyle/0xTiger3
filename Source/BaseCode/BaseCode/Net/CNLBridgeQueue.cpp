@@ -29,11 +29,11 @@ void CNLBridgeQueue::Release()
 }
 
 
-int CNLBridgeQueue::GetFromLogicQueue(char *pBuffer, int nBufferLen)
+bool CNLBridgeQueue::GetFromLogicQueue(char *pBuffer, int nBufferLen)
 {
 	IF(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
 	{
-		return -1;
+		return false;
 	}
 
 	return GetQueue(m_pLogicTaskQueue, pBuffer, nBufferLen);
@@ -42,44 +42,60 @@ int CNLBridgeQueue::GetFromLogicQueue(char *pBuffer, int nBufferLen)
 /*
 	网络层来存放
 */
-int CNLBridgeQueue::PutToLogicQueue(CCircleBuffer *pRecvBuffer)
+bool CNLBridgeQueue::PutToLogicQueue(IPacketHead* pPacketHead)
 {
-	IFn(NULL==pRecvBuffer)
+	IFn(!pPacketHead)
+		return false;
+
+	char* pBuffer = (char*)(pPacketHead);
+	int nBufferLen = pPacketHead->GetPacketSize();
+
+	if (!m_pLogicTaskQueue->WriteBufferAtom(pBuffer, nBufferLen))
 	{
-		return -1;
+		LOGNE("CNLBridgeQueue::PutToLogicQueue,-1==PutToLogicQueue.nDefine1:%d, nDefine2:%d\n", 
+			pPacketHead->GetPacketDefine1(), pPacketHead->GetPacketDefine2());
+
+		return false;
 	}
 
-	IPacketHead PackHead;
-	char BufferPacket[NET_PACKET_BUFF_SIZE]={0};
+	return true;
 
-	//读头部数据大小字段
-	if( -1==pRecvBuffer->TryReadBuffer((char*)&PackHead,  NET_PACKET_HEAD_SIZE) )
-	{
-		return 1;
-	}
+	//IFn(NULL==pRecvBuffer)
+	//{
+	//	return -1;
+	//}
 
-	//打包投入到m_ToLogicQueue
-	if( !m_pLogicTaskQueue->WriteBufferAtom(BufferPacket, PackHead.GetPacketSize()) )
-	{
-		return 1;
-	}
-	
-	//记得刷
-	pRecvBuffer->ReadBufferFlush(PackHead.GetPacketSize());
+	//IPacketHead PackHead;
+	//char BufferPacket[NET_PACKET_BUFF_SIZE]={0};
 
-	//长度我随便写的，体检检测下空间大小，如果不够直接投递，不必等到下次
-	if (pRecvBuffer->GetUseLength() < (NET_PACKET_HEAD_SIZE * 2)) 
-	{
-		return 1;
-	}
+	////读头部数据大小字段
+	//if( -1==pRecvBuffer->TryReadBuffer((char*)&PackHead,  NET_PACKET_HEAD_SIZE) )
+	//{
+	//	return 1;
+	//}
 
-	return 0;
+	////打包投入到m_ToLogicQueue
+	//if( !m_pLogicTaskQueue->WriteBufferAtom(BufferPacket, PackHead.GetPacketSize()) )
+	//{
+	//	return 1;
+	//}
+	//
+	////记得刷
+	//pRecvBuffer->ReadBufferFlush(PackHead.GetPacketSize());
+
+	////长度我随便写的，体检检测下空间大小，如果不够直接投递，不必等到下次
+	//if (pRecvBuffer->GetUseLength() < (NET_PACKET_HEAD_SIZE * 2)) 
+	//{
+	//	return 1;
+	//}
+
+	//return 0;
 }
 
 
 bool CNLBridgeQueue::GetFromNetQueue(char *pBuffer, int nBufferLen)
 {
-	IFn(nBufferLen!=NET_PACKET_BUFF_SIZE || NULL==pBuffer)
+	IFn(!pBuffer)
 	{
 		return false;
 	}
@@ -89,6 +105,9 @@ bool CNLBridgeQueue::GetFromNetQueue(char *pBuffer, int nBufferLen)
 
 bool CNLBridgeQueue::PutToNetQueue(IPacketHead* pPacketHead)
 {
+	IFn(!pPacketHead)
+		return false;
+
 	char* pBuffer = (char*)(pPacketHead);
 	int nBufferLen = pPacketHead->GetPacketSize();
 
@@ -106,6 +125,9 @@ bool CNLBridgeQueue::PutToNetQueue(IPacketHead* pPacketHead)
 
 bool CNLBridgeQueue::GetQueue(CCircleBuffer *pSrcCircleBuffer, char *pDstBuffer, int nBufferLen)
 {
+	IFn(!pSrcCircleBuffer || !pDstBuffer)
+		return false;
+
 	int nPacketIdent=0;
 
 	IPacketHead PackHead;

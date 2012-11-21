@@ -9,7 +9,7 @@ void CMGuid::Init(int nBatchFreeGuid, wchar_t *pFileName, GUID_SET* pGuidSet)
 	m_nBatchFreeGuid = nBatchFreeGuid;
 
 	MEMSET(m_strFileName, 0 , sizeof(m_strFileName));
-	wcsncpy(m_strFileName, pFileName, name_mguid::LEN_FILE_NAME);
+	wcsncpy_s(m_strFileName, pFileName, name_mguid::LEN_FILE_NAME);
 
 	memcpy(m_nGuidSet, pGuidSet, sizeof(m_nGuidSet));
 }

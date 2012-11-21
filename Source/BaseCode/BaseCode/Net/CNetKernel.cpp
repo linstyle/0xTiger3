@@ -158,7 +158,7 @@ void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogi
 			return;
 		}
 
-		if (-1==g_NLBridgeQueue.PutNetTaskQueue(&msgInnerTransfer))
+		if (!g_NLBridgeQueue.PutToLogicQueue(&msgInnerTransfer))
 		{
 			LOGNE("CNetKernel::CloseClientSocket.nNetKey:%d\n", pSocketClient->GetKey());
 		}
@@ -299,13 +299,13 @@ void CNetKernel::LoopConnect()
 void CNetKernel::LoopBridgeQueue()
 {
 	int nResult=0;
-	char BufferPacket[NET_PACKET_BUFF_SIZE*2];
+	char BufferPacket[NET_PACKET_BUFF_SIZE];
 	const char* pBuffer = BufferPacket;
 
 	while (1)
 	{
 		MEMSET(BufferPacket, 0, sizeof(BufferPacket));
-		nResult = g_NLBridgeQueue.GetNetTaskQueue(BufferPacket, NET_PACKET_BUFF_SIZE);
+		nResult = g_NLBridgeQueue.GetFromNetQueue(BufferPacket, NET_PACKET_BUFF_SIZE);
 		if (1==nResult || -1==nResult)
 		{
 			break;
@@ -346,9 +346,35 @@ void CNetKernel::OnRecvSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	while (0==g_NLBridgeQueue.PutLogicTaskQueue(&pSocketClient->m_RecvBuffer))
+	CCircleBuffer* pCircleBuffer = &pSocketClient->m_RecvBuffer;
+	while(1)
 	{
+		PInnerTransfer msgInnerTransfer;
+
+		//读头部数据大小字段
+		if( !pCircleBuffer->TryReadBuffer((char*)&msgInnerTransfer,  NET_PACKET_HEAD_SIZE) )
+		{
+			break;
+		}
+
+		IFn (NET_PACKET_BUFF_SIZE < msgInnerTransfer.GetPacketSize())
+		{
+			break;
+		}
+
+		if (!pCircleBuffer->TryReadBuffer(msgInnerTransfer.GetPacketBuffer(), msgInnerTransfer.GetPacketSize()) )
+		{
+			break;
+		}
+
+		msgInnerTransfer.CreateNtoL(pSocketClient->GetKey());
 		
+		if (!g_NLBridgeQueue.PutToLogicQueue(&msgInnerTransfer))
+		{
+			break;
+		}
+
+		pCircleBuffer->ReadBufferFlush(msgInnerTransfer.GetPacketSize());		
 	}
 
 	IFn(-1==pSocketClient->Recv())

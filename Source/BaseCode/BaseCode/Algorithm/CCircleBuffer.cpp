@@ -29,12 +29,22 @@ void CCircleBuffer::Init(int nBufferLenBytes)
 
 char* CCircleBuffer::GetWriteBuffer1(int *pLenBytes)
 {
+	if (!pLenBytes)
+	{
+		return NULL;
+	}
+
 	*pLenBytes = m_SingleBuffer[m_nWriteIndex].GetFreeLengthWrite();
 	return m_SingleBuffer[m_nWriteIndex].GetFreeBuffer();
 }
 
 char* CCircleBuffer::GetWriteBuffer2(int *pLenBytes)
 {
+	if(!pLenBytes)
+	{
+		return NULL;
+	}
+
 	int nWriteIndex = (m_nWriteIndex+1) & 0x1;
 
 	*pLenBytes = m_SingleBuffer[nWriteIndex].GetFreeLengthWrite();
@@ -43,6 +53,11 @@ char* CCircleBuffer::GetWriteBuffer2(int *pLenBytes)
 
 char* CCircleBuffer::GetReadBuffer(int *pWishLenBytes)
 {
+	if (!pWishLenBytes)
+	{
+		return NULL;
+	}
+
 	*pWishLenBytes = m_SingleBuffer[m_nReadIndex].GetUseLength();
 	char *pBuffer = m_SingleBuffer[m_nReadIndex].GetUseBuffer();
 

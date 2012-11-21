@@ -25,7 +25,7 @@ public:
 	~CNLBridgeQueue();
 
 	bool GetFromLogicQueue(char *pBuffer, int nBufferLen);
-	bool PutToLogicQueue(CCircleBuffer *pRecvBuffer);	
+	bool PutToLogicQueue(IPacketHead* pPacketHead);	
 
 	bool GetFromNetQueue(char *pBuffer, int nBufferLen);
 	bool PutToNetQueue(IPacketHead* pPacketHead);

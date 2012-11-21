@@ -121,7 +121,7 @@ bool CSocketAPI::InitSocketUDPC(SOCKET &Socket, ULONG nIP, USHORT nPort, ULONG n
 	return true;
 }
 
-int CSocketAPI::ConnectNonb(int fdNonb, const sockaddr *pConnectAddr, int nConnectAddrSize, int nSec)
+int CSocketAPI::ConnectNonb(SOCKET fdNonb, const sockaddr *pConnectAddr, int nConnectAddrSize, int nSec)
 {
 	int nResult;
 	/*  

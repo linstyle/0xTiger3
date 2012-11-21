@@ -55,12 +55,12 @@ public:
 	unsigned int GetNetKey();
 	P_INNER_TRANSFER* GetInnerTransferPacket();
 
-	//网络到逻辑层
-	bool CreateNtoL(unsigned int nNetKey, const char* pNetPacket, unsigned short nNetPacketSize);
+	//网络到逻辑层，这里提升效率，不用外部考别，直接GetPacketBuffer()出去考别
+	bool CreateNtoL(unsigned int nNetKey);
 	bool CreateNtoLErr(unsigned int nNetKey);
 
 	//逻辑到网络层
-	bool CreateLtoN(unsigned int nNetKey, const char* pNetPacket, unsigned short nNetPacketSize);
+	bool CreateLtoN(unsigned int nNetKey, const char* pLogicPacket, unsigned short nLogicPacketSize);
 	bool CreateLtoNErr(unsigned int nNetKey);
 	
 private:
