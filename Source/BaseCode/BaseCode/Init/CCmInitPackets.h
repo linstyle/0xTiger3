@@ -7,7 +7,7 @@
 
 #include "Singleton.h"
 
-//#include "PNLInnerNotic.h"
+//#include "PInnerTransfer.h"
 //#include "PLogin.h"
 
 class CCmInitPackets:public Singleton<CCmInitPackets>

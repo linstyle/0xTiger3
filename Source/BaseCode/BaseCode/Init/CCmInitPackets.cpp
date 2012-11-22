@@ -1,19 +1,19 @@
-
 #include "CCmInitPackets.h"
-//#include "PInnerTransfer.h"
+#include <WinSock2.h>
+#include "PInnerTransfer.h"
 
 
 initialiseSingleton(CCmInitPackets);
 
 CCmInitPackets::CCmInitPackets()
 {
-	//new PInnerTransfer;   //内部协议
+	new POInnerTransfer;   //内部协议
 	//new PLoginGLObject;               //登陆包
 }
 
 
 CCmInitPackets::~CCmInitPackets()
 {
-	//delete PInnerTransfer::getSingletonPtr();
+	delete POInnerTransfer::getSingletonPtr();
 	//delete PLoginGLObject::getSingletonPtr();
 }

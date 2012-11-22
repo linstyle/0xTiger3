@@ -187,7 +187,7 @@ void CLog2::CloseSaveTerminal()
 //输出到各个终端
 void CLog2::WriteTerminal(LPCSTR pFile, int nLine, const char* format, va_list VaList)
 {
-	MEMSET(m_szLineBuffer, 0 , sizeof(m_szLineBuffer));
+	MEMSET(&m_szLineBuffer, 0 , sizeof(m_szLineBuffer));
 	TIME_HHMMSS TimeHHMMSS;
 	int nSprintfLen=0, nSumSprintfLen=0, nPrefixLen=0;
 	char *pszLineBuffer = m_szLineBuffer;

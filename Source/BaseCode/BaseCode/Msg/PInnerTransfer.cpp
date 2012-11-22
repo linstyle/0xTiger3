@@ -1,7 +1,7 @@
 #include "CNetKernel.h"
 #include "PInnerTransfer.h"
 
-
+initialiseSingleton(POInnerTransfer);
 
 PInnerTransfer::PInnerTransfer()
 {
@@ -81,8 +81,6 @@ bool PInnerTransfer::CreateLtoNErr(unsigned int nNetKey)
 /****************************
 	IPacketObject
 *****************************/
-POInnerTransfer g_POInnerTransfer;
-
 void POInnerTransfer::Execute(IPacketHead* pPackHead)
 {
 	IFn(!pPackHead)

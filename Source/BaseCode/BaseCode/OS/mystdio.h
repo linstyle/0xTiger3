@@ -5,6 +5,7 @@
 #pragma once
 #include "MTASSERT.h"
 
+//dst不能为指针
 #define MEMSET(DST, VAL, S)  {IF(sizeof(*DST)!=S){} memset(DST, VAL, S);}
 
 //char* SafeCopy(char* pDst, const char* pSrc, int nSrcLen)
