@@ -40,4 +40,4 @@ private:
 
 };
 
-#define g_SingletonManager CCmInitSingleton::getSingleton()
+#define g_SingletonManager CCommonLibInit::getSingleton()

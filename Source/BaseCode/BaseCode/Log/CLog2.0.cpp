@@ -204,7 +204,7 @@ void CLog2::WriteTerminal(LPCSTR pFile, int nLine, const char* format, va_list V
 		nSumSprintfLen+=nSprintfLen;
 	}
 	//具体的内容
-	nSprintfLen = _vsnprintf_s(pszLineBuffer+nSumSprintfLen, name_log2::LINE_BUFFER_LEN-nSumSprintfLen, format, VaList);
+	nSprintfLen = _vsnprintf(pszLineBuffer+nSumSprintfLen, name_log2::LINE_BUFFER_LEN-nSumSprintfLen, format, VaList);
 	if (-1!=nSprintfLen)
 	{
 		nSumSprintfLen+=nSprintfLen;
