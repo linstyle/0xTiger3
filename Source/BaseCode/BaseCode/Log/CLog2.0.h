@@ -53,11 +53,12 @@ class CLogManager2;
 #define  LOGNW(format, ...)  g_Log2.Write("log\\WarningNet", __FILE__, __LINE__, format, __VA_ARGS__)
 #define  LOGNE(format, ...)  g_Log2.Write("log\\ErrNet", __FILE__, __LINE__, format, __VA_ARGS__)
 
-
-
 //内存模块
 #define  LOGME(format, ...)  g_Log2.Write("log\\ErrMemery", __FILE__, __LINE__, format, __VA_ARGS__)
 #define  LOGMN(format, ...)  g_Log2.Write("log\\NoticeMemery", __FILE__, __LINE__, format, __VA_ARGS__)
+
+//日志模块，仅供日志使用。肯定创建成功
+#define  __LOG(format, ...)  g_Log2.Write("log1\\log", __FILE__, __LINE__, format, __VA_ARGS__)
 
 
 #define  LOGU1(format, ...) g_Log2.Write("log\\UserDefine1", __FILE__, __LINE__, format, __VA_ARGS__)
@@ -69,7 +70,7 @@ namespace name_log2
 	const int SAVE_FILE_TITLE_NAME_LEN = 32;   //保存的文件名长度(不包括时间)
 	const int SAVE_FILE_NAME_LEN = SAVE_FILE_TITLE_NAME_LEN+30;   //总长度，30为时间+.log
 
-	const int LINE_BUFFER_LEN = 32*1024;        //kb,单次允许写入临时缓冲区的大小
+	const int LINE_BUFFER_LEN = 16*1024;        //kb,单次允许写入临时缓冲区的大小
 //#todo 看看能不能优化成多个日志使用一个队列
 	//环形缓冲区大小,写入到终端前的临时存放空间, 要大于LINE_BUFFER_LEN
 	const int CIRCLE_BUFFER_LEN = LINE_BUFFER_LEN*3;  
@@ -95,7 +96,6 @@ public:
 	void FlushWrite();
 
 private:
-	void InitCircleBuffer();
 	void Release();
 
 	//重建保存终端
@@ -138,7 +138,7 @@ public:
 	CLogManager2();
 	~CLogManager2();
 
-	void Write(const char* pFileName,  LPCSTR pFile, int nLine, LPCSTR format, ...);
+	bool Write(const char* pFileName,  LPCSTR pFile, int nLine, LPCSTR format, ...);
 
 private:
 	void Init();

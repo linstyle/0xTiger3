@@ -32,6 +32,10 @@ public:
 	~CCommonLibInit();
 
 private:
+	//一些独立库的初始化放这
+	void InitSocketLib();	
+	void ReleaseSocketLib();
+
 
 public:
 

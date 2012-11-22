@@ -11,7 +11,6 @@ CNetDriver2::CNetDriver2()
 	new CNLBridgeQueue;
 
 	m_bHasInit = false;
-	InitSocketLib();	
 }
 
 CNetDriver2::~CNetDriver2()
@@ -94,25 +93,8 @@ void CNetDriver2::Init()
 void CNetDriver2::Release()
 {
 	ReleaseAllConnect();
-	ReleaseSocketLib();
-
 	delete g_NLBridgeQueue.getSingletonPtr();
 }
-
-
-void CNetDriver2::InitSocketLib()
-{
-	WSADATA WsaData;
-
-	INITASSERT( 0!=WSAStartup(MAKEWORD(2,2),&WsaData) );
-}
-
-void CNetDriver2::ReleaseSocketLib()
-{
-	WSACleanup();
-}
-
-
 
 void CNetDriver2::ReleaseAllConnect()
 {

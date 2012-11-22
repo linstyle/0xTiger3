@@ -42,6 +42,8 @@ void  FreeSocketClientObject(CSocketClient* p)
 
 CSocketClient::CSocketClient()
 {
+	memset(this, 0, sizeof(CSocketClient));
+
 	m_nKey = 0;
 	m_bAutoConnect = false;
 	Init();

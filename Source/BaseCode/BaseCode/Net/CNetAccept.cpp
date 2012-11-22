@@ -129,7 +129,7 @@ unsigned int WINAPI CNetAccept::ThreadAccept(void* pParam)
 			continue;
 		}
 
-		IFn( !pSocketServer->Accept(pSocketClient) )
+		if( !pSocketServer->Accept(pSocketClient) )
 		{
 			FreeSocketClientObject(pSocketClient);
 			pSocketClient = NULL;

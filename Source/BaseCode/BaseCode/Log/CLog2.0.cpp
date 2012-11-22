@@ -6,25 +6,6 @@
 
 initialiseSingleton(CLogManager2);
 
-void CLogManager2::Init()
-{
-	/*
-		对各个日志实例都初始化一遍,保证都创建
-	*/
-	LOGN("");
-	LOGW("");
-	LOGE("");
-
-	LOGNN("");
-	LOGNW("");
-	LOGNE("");
-
-	LOGMN("");
-	LOGME("");
-	LOGU1("");
-	StartThread();
-}
-
 CLog2::CLog2()
 {
 	m_hFile = NULL;
@@ -40,18 +21,19 @@ CLog2::~CLog2()
 
 bool CLog2::Init(const char* pSaveFileName)
 {
+	if (!pSaveFileName)
+	{
+		return false;
+	}
+
 	strncpy_s(m_szFileTitleName, pSaveFileName,  name_log2::SAVE_FILE_TITLE_NAME_LEN-1);
 
-	InitCircleBuffer();
+	m_CircleBuffer.Init(name_log2::CIRCLE_BUFFER_LEN);
 
 	//开文件
 	return CreateSaveTerminal();
 }
 
-void CLog2::InitCircleBuffer()
-{
-	m_CircleBuffer.Init(name_log2::CIRCLE_BUFFER_LEN);
-}
 
 void CLog2::Release()
 {
@@ -71,7 +53,7 @@ void CLog2::FlushWrite()
 {
 	if (NULL==m_hFile)
 	{
-		printf("Err, CLog2::FlushWrite(),NULL==m_hFile\n");
+		__LOG("Err, CLog2::FlushWrite(),NULL==m_hFile\n");
 		return;
 	}
 	/*
@@ -94,7 +76,7 @@ void CLog2::FlushWrite()
 		int nRet=fwrite(pTempBuffer, 1, nFlushBytes, m_hFile);
 		if (0==nRet)
 		{
-			printf("Err, CLog::Flush():fwrite:ErrNum(%d)\n", GetLastError());
+			__LOG("Err, CLog::Flush():fwrite:ErrNum(%d)\n", GetLastError());
 			m_CircleBuffer.ReadBufferFlush(nHasFlushBytes);
 			
 			return;
@@ -131,43 +113,45 @@ void CLog2::ReCreateSaveTerminal()
 
 bool CLog2::CreateSaveTerminal()
 {
-	if (!m_hFile)
+	//有文件？
+	if (m_hFile)
 	{
 		return false;
 	}
 
 	//取到文件名
 	m_nFileNameHour = CTime::GetHH();
+	memset(m_szFileName, 0, sizeof(m_szFileName));
 	_snprintf_s(m_szFileName, sizeof(m_szFileName)-1, "%s%d.log", m_szFileTitleName,
 		CTime::GetMMDDHH() );
 
 	//创建文件夹
-	char *pPathNameFlag = strstr(m_szFileTitleName, "\\");
-	if (pPathNameFlag)
-	{
-		char szPathName[32]={0};
-		char *pszPathName = szPathName;
-		char c=*pPathNameFlag;
-		*pPathNameFlag='\0';
+	//char *pHasDirectory = strstr(m_szFileTitleName, "\\");	
+	//if (pHasDirectory)
+	//{
+	//	char szPathName[32]={0};
+	//	char *pszPathName = szPathName;
+	//	char c=*pHasDirectory;
+	//	*pHasDirectory='\0';
 
-		strncpy_s(szPathName, m_szFileTitleName, 32);
-		
-		if ( !CreateDirectoryA(pszPathName, NULL) )
-		{
-			if (GetLastError()!=ERROR_ALREADY_EXISTS)
-			{
-				printf("Err,CLog2::CreateSaveTerminal(). ErrNum:%d\n", GetLastError());
-				return false;
-			}
-		}
+	//	strncpy_s(szPathName, m_szFileTitleName, 32);
+	//	
+	//	if ( !CreateDirectoryA(pszPathName, NULL) )
+	//	{
+	//		if (GetLastError()!=ERROR_ALREADY_EXISTS)
+	//		{
+	//			__LOG("Err,CLog2::CreateSaveTerminal(). ErrNum:%d\n", GetLastError());
+	//			return false;
+	//		}
+	//	}
 
-		*pPathNameFlag = c;
-	}
+	//	*pHasDirectory = c;
+	//}
 
 	//创建文件
-	if (0!=fopen_s(&m_hFile, m_szFileName, "a+"))
+	if (0!=fopen_s(&m_hFile, m_szFileName, "w"))
 	{
-		printf("Err, CLog2::CreateSaveTerminal():ErrID(%d)\n", GetLastError());
+		__LOG("Err, CLog2::CreateSaveTerminal():ErrID(%d)\n", GetLastError());
 		return false;
 	}
 	
@@ -224,13 +208,18 @@ void CLog2::WriteTerminal(LPCSTR pFile, int nLine, const char* format, va_list V
 	{
 		if ( !m_CircleBuffer.WriteBufferAtom(m_szLineBuffer, nSumSprintfLen) )
 		{
-			LOGW("Warning, CLog2::WriteTerminal:m_CircleBuffer.WriteBuffer, nSumSprintfLen(%d)\n", nSumSprintfLen);
+			__LOG("Warning, CLog2::WriteTerminal:m_CircleBuffer.WriteBuffer, nSumSprintfLen(%d)\n", nSumSprintfLen);
 		}
 	}
 }
 
-void CLogManager2::Write(const char* pFileName ,  LPCSTR pFile, int nLine, LPCSTR format, ...)
+bool CLogManager2::Write(const char* pFileName ,  LPCSTR pFile, int nLine, LPCSTR format, ...)
 {
+	if (!pFileName)
+	{
+		return false;
+	}
+
 	va_list valist;
 
 	va_start(valist, format);
@@ -238,12 +227,14 @@ void CLogManager2::Write(const char* pFileName ,  LPCSTR pFile, int nLine, LPCST
 	CLog2 *pLog = FindLogInstance(pFileName);
 	if (NULL==pLog)
 	{
-		printf("Err, CLogManager2::Write(), NULL==pLog\n");
-		return;
+		__LOG("Err, CLogManager2::Write(), NULL==pLog.FileName:%s\n", pFileName);
+		return false;
 	}
 	pLog->Write(pFile, nLine, format, valist);
 
 	va_end(valist);	
+
+	return true;
 }
 
 CLogManager2::CLogManager2()
@@ -259,12 +250,19 @@ CLogManager2::~CLogManager2()
 	Release();
 }
 
+void CLogManager2::Init()
+{
+	INITASSERT(!__LOG(""));
+
+	StartThread();
+}
+
+
 void CLogManager2::Release()
 {
 	StopThread();
 
-	MAP_LOG_INSTANCE::iterator ite;
-	
+	MAP_LOG_INSTANCE::iterator ite;	
 	for (ite = m_mapLogInstantce.begin(); ite!=m_mapLogInstantce.end(); ite++)
 	{
 		delete ite->second;
@@ -288,13 +286,14 @@ CLog2* CLogManager2::NewLogInstantce(const char* pFileName)
 {
 	CLog2 *pLog = new CLog2;
 
+	//先放入，防止INIT失败，内存泄露
+	m_mapLogInstantce[pFileName]=pLog;
+
 	if ( false==pLog->Init(pFileName) )
 	{
 		return NULL;
 	}
 	
-	m_mapLogInstantce[pFileName]=pLog;
-
 	return pLog;
 }
 
@@ -310,7 +309,7 @@ void CLogManager2::StopThread()
 
 	if( WAIT_FAILED==WaitForSingleObject(m_hThread, 3000) )
 	{
-		printf("Err, CLogManager2::StopThread,ErrNum:%d\n", GetLastError());
+		__LOG("Err, CLogManager2::StopThread,ErrNum:%d\n", GetLastError());
 	}
 	CloseHandle(m_hThread);
 }

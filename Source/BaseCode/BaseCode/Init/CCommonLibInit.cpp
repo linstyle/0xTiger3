@@ -6,22 +6,25 @@ initialiseSingleton(CCommonLibInit);
 
 CCommonLibInit::CCommonLibInit()
 {
+
 //	g_pNetTaskQueue = new CNetTaskQueue; //网络任务队列
 	
 	//new CWindowsSlabManager;          //内存池
 	//printf("Notic, CCommonLibInit::CCommonLibInit():CWindowsSlabManager() OK\n");
 
+	InitSocketLib();
+
 	new CLogManager2;                       //日志
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CLogManager2 OK\n");
+
+	new CNetDriver2;						//网络驱动层
+	printf("Notic, CCommonLibInit::CCommonLibInit():New CNetDriver2 OK\n");
 
 	new CPacketFactory;						//包工厂
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CPacketFactory OK\n");
 
 	new CCmInitPackets;						//公共协议包
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CCmInitPackets OK\n");
-
-	new CNetDriver2;						//网络驱动层
-	printf("Notic, CCommonLibInit::CCommonLibInit():New CNetDriver2 OK\n");
 
 	//new CObjectMapManager;              //网络对象管理
 	//printf("Notic, CCommonLibInit::CCommonLibInit():New CNetObjectManager OK\n");
@@ -44,14 +47,14 @@ CCommonLibInit::CCommonLibInit()
 
 CCommonLibInit::~CCommonLibInit()
 {
-	delete g_NetDriver2.getSingletonPtr();      //网络驱动层
-	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CNetDriver2 OK\n");
-
 	delete CCmInitPackets::getSingletonPtr();  //公共协议包
 	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CCmInitPackets OK\n");
 
 	delete g_PacketFactory.getSingletonPtr();  //包工厂
 	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CPacketFactory OK\n");
+
+	delete g_NetDriver2.getSingletonPtr();      //网络驱动层
+	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CNetDriver2 OK\n");
 
 	Sleep(2000);
 	delete CLogManager2::getSingletonPtr();    //日志
@@ -82,4 +85,18 @@ CCommonLibInit::~CCommonLibInit()
 
 	//delete CWindowsSlabManager::getSingletonPtr();
 	//printf("Notic, CCommonLibInit::~CCommonLibInit():CWindowsSlabManager OK\n");
+
+	ReleaseSocketLib();
+}
+
+void CCommonLibInit::InitSocketLib()
+{
+	WSADATA WsaData;
+
+	INITASSERT( 0!=WSAStartup(MAKEWORD(2,2),&WsaData) );	
+}
+
+void CCommonLibInit::ReleaseSocketLib()
+{
+	WSACleanup();
 }

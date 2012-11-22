@@ -63,8 +63,6 @@ private:
 		≥ı ºªØ°¢ Õ∑≈
 	*/
 	void Release();
-	void InitSocketLib();	
-	void ReleaseSocketLib();
 	void ReleaseAllConnect();
 
 public:

@@ -35,10 +35,10 @@
 #define DebugBreak()    _asm { int 3 }
 #endif
 
-__inline void CmAssert(LPCSTR pFile, int nLine, PCSTR pExpr, int nErrnum)
+__inline void CmAssert(LPCSTR pFile, int nLine, PCSTR pExpr, int nErrnum, int nNetErrnum=0)
 {
 	char szMsg[2*MAX_PATH];
-	wsprintfA(szMsg, "File %s, line %d : %s, errnum:%d", pFile, nLine, pExpr, nErrnum);
+	wsprintfA(szMsg, "File %s, line %d : %s, errnum:%d", pFile, nLine, pExpr, nErrnum, nNetErrnum);
 
 	char szTitle[MAX_PATH];
 	GetModuleFileNameA(NULL, szTitle, _countof(szTitle));
@@ -52,8 +52,8 @@ __inline void CmAssert(LPCSTR pFile, int nLine, PCSTR pExpr, int nErrnum)
 #define  INITASSERT(a) if ((a)) InitAssert(__FILE__, __LINE__, #a, GetLastError())
 __inline void InitAssert(LPCSTR pFile, int nLine, PCSTR pExpr, int nErrnum)
 {
-	LOGE("Err, InitAssert. Expr:%s, ErrNum:%d\n", pExpr, nErrnum);
 	CmAssert(pFile, nLine, pExpr, nErrnum);
+	LOGE("Err, InitAssert. Expr:%s, ErrNum:%d\n", pExpr, nErrnum);
 }
 
 
@@ -80,16 +80,16 @@ __inline void InitAssert(LPCSTR pFile, int nLine, PCSTR pExpr, int nErrnum)
 	只是IFn这个宏名字难记了点，小n表示net
 */
 #ifdef _DEBUG
-#define  MTASSERTn(pFile, nLine, pExpr, nErrnum)	\
-	LOGNE("Err, MTASSERT. Expr:%s, ErrNum:%d\n", pExpr, nErrnum),		\
-	CmAssert(pFile, nLine, pExpr, nErrnum)
+#define  MTASSERTn(pFile, nLine, pExpr, nErrnum, nNetErrnum)	\
+	CmAssert(pFile, nLine, pExpr, nErrnum, nNetErrnum),		\
+	LOGNE("Err, MTASSERT. Expr:%s, ErrNum:%d\n", pExpr, nErrnum, nNetErrnum)
 #else
 #define  MTASSERT(pFile, nLine, pExpr, nErrnum) \
 	LOGNE("Err, InitAssert. Expr:%s, ErrNum:%d\n", pExpr, nErrnum),
 #endif
 
 
-#define  IFn(a) if( (a) ?(MTASSERTn(__FILE__, __LINE__, #a, GetLastError()),1) :  0)
+#define  IFn(a) if( (a) ?(MTASSERTn(__FILE__, __LINE__, #a, GetLastError(), WSAGetLastError()),1) :  0)
 
 /*
 	跟MTASSERT一样，只是给内存池(slab)层使用，换个文件名
@@ -97,8 +97,9 @@ __inline void InitAssert(LPCSTR pFile, int nLine, PCSTR pExpr, int nErrnum)
 */
 #ifdef _DEBUG
 #define  MTASSERTm(pFile, nLine, pExpr, nErrnum)	\
-	LOGME("Err, MTASSERT. Expr:%s, ErrNum:%d\n", pExpr, nErrnum)	,		\
-	CmAssert(pFile, nLine, pExpr, nErrnum)
+	CmAssert(pFile, nLine, pExpr, nErrnum),		\
+	LOGME("Err, MTASSERT. Expr:%s, ErrNum:%d\n", pExpr, nErrnum)
+	
 #else
 #define  MTASSERTm(pFile, nLine, pExpr, nErrnum) \
 	LOGME("Err, InitAssert. Expr:%s, ErrNum:%d\n", pExpr, nErrnum),

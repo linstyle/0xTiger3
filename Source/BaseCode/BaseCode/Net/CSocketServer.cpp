@@ -50,7 +50,7 @@ bool CSocketServer::Accept(CSocketClient *pSocketClient)
 
 	if(0==nResult)
 	{
-		IFn(WSAGetLastError() != WSA_IO_PENDING)
+		if(WSAGetLastError() != WSA_IO_PENDING)
 		{
 			/* Õâ¶ÎÊÇÕªÂ¼apache
 			We can get here when:
