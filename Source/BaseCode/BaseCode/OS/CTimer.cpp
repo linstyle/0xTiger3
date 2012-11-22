@@ -14,7 +14,7 @@ void CTimer::Init()
 
 void CTimer::InitVecs()
 {
-	MEMSET(m_Count, 0, sizeof(m_Count));
+	MEMSET(&m_Count, 0, sizeof(m_Count));
 	/*
 		初始化好vec的指针
 	*/

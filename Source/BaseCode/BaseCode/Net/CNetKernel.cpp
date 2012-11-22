@@ -304,7 +304,7 @@ void CNetKernel::LoopBridgeQueue()
 
 	while (1)
 	{
-		MEMSET(BufferPacket, 0, sizeof(BufferPacket));
+		MEMSET(&BufferPacket, 0, sizeof(BufferPacket));
 		nResult = g_NLBridgeQueue.GetFromNetQueue(BufferPacket, NET_PACKET_BUFF_SIZE);
 		if (1==nResult || -1==nResult)
 		{

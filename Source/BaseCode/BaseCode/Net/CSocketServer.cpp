@@ -15,7 +15,7 @@ CSocketServer::~CSocketServer()
 
 void CSocketServer::Init()
 {
-	MEMSET(m_szName, 0, sizeof(m_szName));	
+	MEMSET(&m_szName, 0, sizeof(m_szName));	
 	m_nIP = 0;
 	m_nPort = 0;
 	m_nSocket = 0;

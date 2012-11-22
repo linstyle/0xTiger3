@@ -26,8 +26,7 @@ void CSingleBuffer::InitBuffer(int nBytes)
 {
 	m_pBuffer = new char[nBytes];
 	m_nBufferLen = nBytes;
-	MEMSET(m_pBuffer, 0, nBytes*sizeof(char));
-
+	memset(m_pBuffer, 0, nBytes*sizeof(char));
 }
 /*
 

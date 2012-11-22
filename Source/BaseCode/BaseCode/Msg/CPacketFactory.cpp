@@ -7,11 +7,11 @@ initialiseSingleton(CPacketFactory);
 CPacketFactory::CPacketFactory()
 {
 	m_nFactorySize = PACKET1_MAX;
-	MEMSET(m_bFactory, 0, PACKET1_MAX);
+	MEMSET(&m_bFactory, 0, sizeof(m_bFactory));
 }
 CPacketFactory::~CPacketFactory()
 {
-	MEMSET(m_Factory, 0, sizeof(m_Factory));
+	MEMSET(&m_Factory, 0, sizeof(m_Factory));
 }
 
 void CPacketFactory::AddPacketObject(IPacketObject* pPacketObject)

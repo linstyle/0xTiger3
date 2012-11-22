@@ -80,7 +80,7 @@ private:
 	你的包工厂定义,用于管理收到包后的处理
 	继承IPacketObject和一个单体
 *****************************/
-class POInnerTransfer:public IPacketObject
+class POInnerTransfer:public Singleton<POInnerTransfer>, public IPacketObject
 { 
 public:
 	POInnerTransfer():IPacketObject(PACKET1_INNER_NET_LOGIC_QUEUE)

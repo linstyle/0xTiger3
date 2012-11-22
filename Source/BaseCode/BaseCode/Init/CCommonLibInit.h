@@ -5,12 +5,12 @@
 
 #pragma once
 
+
 #include "Singleton.h"
 #include "CNetDriver2.h"
 #include "Clog2.0.h"
 #include "CPacketFactory.h"
-
-//#include "CCmInitPackets.h"
+#include "CCmInitPackets.h"
 //#include "CThreadPool.h"
 //#include "CThreadQuit.h"
 //#include "CNetTransToLogic.h"

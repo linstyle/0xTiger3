@@ -65,8 +65,8 @@ __inline void InitAssert(LPCSTR pFile, int nLine, PCSTR pExpr, int nErrnum)
 
 #ifdef _DEBUG
 	#define  MTASSERT(pFile, nLine, pExpr, nErrnum)	\
-	LOGE("Err, MTASSERT. Expr:%s, ErrNum:%d\n", pExpr, nErrnum)	,		\
-	CmAssert(pFile, nLine, pExpr, nErrnum)		
+	CmAssert(pFile, nLine, pExpr, nErrnum),			\
+	LOGE("Err, MTASSERT. Expr:%s, ErrNum:%d\n", pExpr, nErrnum)			
 #else
 	#define  MTASSERT(pFile, nLine, pExpr, nErrnum) \
 		LOGE("Err, InitAssert. Expr:%s, ErrNum:%d\n", pExpr, nErrnum),

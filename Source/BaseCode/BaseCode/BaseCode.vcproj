@@ -495,6 +495,14 @@
 			Name="Init"
 			>
 			<File
+				RelativePath=".\Init\CCmInitPackets.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Init\CCmInitPackets.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Init\CCommonLibInit.cpp"
 				>
 			</File>
@@ -715,6 +723,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\ClassDiagram1.cd"
+			>
+		</File>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>
