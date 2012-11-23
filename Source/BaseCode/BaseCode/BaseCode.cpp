@@ -18,7 +18,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		LOGU1("%d\n", i);
 	}
-	Sleep(3000);
+	Sleep(10000);
 
 	return 0;
 }

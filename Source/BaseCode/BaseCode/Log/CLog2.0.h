@@ -58,7 +58,7 @@ class CLogManager2;
 #define  LOGMN(format, ...)  g_Log2.Write("log\\NoticeMemery", __FILE__, __LINE__, format, __VA_ARGS__)
 
 //日志模块，仅供日志使用。肯定创建成功
-#define  __LOG(format, ...)  g_Log2.Write("log1\\log", __FILE__, __LINE__, format, __VA_ARGS__)
+#define  __LOG(format, ...)  g_Log2.Write("log\\log", __FILE__, __LINE__, format, __VA_ARGS__)
 
 
 #define  LOGU1(format, ...) g_Log2.Write("log\\UserDefine1", __FILE__, __LINE__, format, __VA_ARGS__)
@@ -67,8 +67,7 @@ class CLogManager2;
 
 namespace name_log2
 {
-	const int SAVE_FILE_TITLE_NAME_LEN = 32;   //保存的文件名长度(不包括时间)
-	const int SAVE_FILE_NAME_LEN = SAVE_FILE_TITLE_NAME_LEN+30;   //总长度，30为时间+.log
+	const int SAVE_LOG_NAME_LEN = 64;   //保存的文件名长度
 
 	const int LINE_BUFFER_LEN = 16*1024;        //kb,单次允许写入临时缓冲区的大小
 //#todo 看看能不能优化成多个日志使用一个队列
@@ -124,8 +123,7 @@ private:
 	CCircleBuffer m_CircleBuffer;
 
 	//文件名
-	char m_szFileTitleName[name_log2::SAVE_FILE_TITLE_NAME_LEN];
-	char m_szFileName[name_log2::SAVE_FILE_NAME_LEN ];
+	char m_szFileName[name_log2::SAVE_LOG_NAME_LEN];
 
 	//时间
 	DWORD m_nFileNameHour;

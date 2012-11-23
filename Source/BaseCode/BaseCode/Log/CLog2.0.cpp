@@ -11,7 +11,6 @@ CLog2::CLog2()
 	m_hFile = NULL;
 	m_nFileNameHour = 0;
 	memset(m_szFileName, 0, sizeof(m_szFileName));
-	memset(m_szFileTitleName, 0, sizeof(m_szFileTitleName));
 }
 
 CLog2::~CLog2()
@@ -26,7 +25,7 @@ bool CLog2::Init(const char* pSaveFileName)
 		return false;
 	}
 
-	strncpy_s(m_szFileTitleName, pSaveFileName,  name_log2::SAVE_FILE_TITLE_NAME_LEN-1);
+	strncpy_s(m_szFileName, pSaveFileName,  sizeof(m_szFileName)-1);
 
 	m_CircleBuffer.Init(name_log2::CIRCLE_BUFFER_LEN);
 
@@ -121,35 +120,32 @@ bool CLog2::CreateSaveTerminal()
 
 	//取到文件名
 	m_nFileNameHour = CTime::GetHH();
-	memset(m_szFileName, 0, sizeof(m_szFileName));
-	_snprintf_s(m_szFileName, sizeof(m_szFileName)-1, "%s%d.log", m_szFileTitleName,
+	char szDynaFileName[name_log2::SAVE_LOG_NAME_LEN]={0};
+
+	_snprintf_s(szDynaFileName, sizeof(szDynaFileName)-1, "%s%d.log", m_szFileName,
 		CTime::GetMMDDHH() );
 
 	//创建文件夹
-	//char *pHasDirectory = strstr(m_szFileTitleName, "\\");	
-	//if (pHasDirectory)
-	//{
-	//	char szPathName[32]={0};
-	//	char *pszPathName = szPathName;
-	//	char c=*pHasDirectory;
-	//	*pHasDirectory='\0';
-
-	//	strncpy_s(szPathName, m_szFileTitleName, 32);
-	//	
-	//	if ( !CreateDirectoryA(pszPathName, NULL) )
-	//	{
-	//		if (GetLastError()!=ERROR_ALREADY_EXISTS)
-	//		{
-	//			__LOG("Err,CLog2::CreateSaveTerminal(). ErrNum:%d\n", GetLastError());
-	//			return false;
-	//		}
-	//	}
-
-	//	*pHasDirectory = c;
-	//}
+	char *pHasDirectory = strstr(m_szFileName, "\\");	
+	if (pHasDirectory)
+	{
+		//目录名
+		char szDirecName[name_log2::SAVE_LOG_NAME_LEN/2]={0};
+		sscanf(szDynaFileName, "%[^\\]", szDirecName);
+		
+		if ( !CreateDirectoryA(szDirecName, NULL) )
+		{
+			if (GetLastError()!=ERROR_ALREADY_EXISTS)
+			{
+				__LOG("Err,CLog2::CreateSaveTerminal(). ErrNum:%d\n", GetLastError());
+				return false;
+			}
+		}
+	}
 
 	//创建文件
-	if (0!=fopen_s(&m_hFile, m_szFileName, "w"))
+	m_hFile = fopen(szDynaFileName, "a+");
+	if( NULL == m_hFile )
 	{
 		__LOG("Err, CLog2::CreateSaveTerminal():ErrID(%d)\n", GetLastError());
 		return false;
@@ -201,7 +197,7 @@ void CLog2::WriteTerminal(LPCSTR pFile, int nLine, const char* format, va_list V
 
 	if (name_log2::PUT_MASK & name_log2::PUT_MASK_CONSOLE)
 	{
-		printf("%s\n", pszLineBuffer+nPrefixLen);
+		printf("%s", pszLineBuffer+nPrefixLen);
 	}
 
 	if (name_log2::PUT_MASK & name_log2::PUT_MASK_HD)

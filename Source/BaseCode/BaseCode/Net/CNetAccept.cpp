@@ -53,7 +53,7 @@ bool CNetAccept::SetSocketServer(const char* pName, const char* pListenIP, USHOR
 
 	m_SocketServer.m_nSocket = 0;
 	m_SocketServer.m_nIP = inet_addr(pListenIP);
-	m_SocketServer.m_nPort = htons(nListenPort);
+	m_SocketServer.m_nPort = nListenPort;
 
 	m_SocketServer.m_OverlappedAccept.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
