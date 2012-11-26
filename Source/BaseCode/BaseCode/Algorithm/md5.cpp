@@ -1,5 +1,4 @@
 #include "md5.h"
-#include "mystdio.h"
 
 std::string CMD5::MD5(char* pBuf, UINT nLength)
 {
@@ -215,7 +214,7 @@ std::string CMD5::Final()
 	for ( int i=0; i < MD5_SIZE; i++) 
 	{
 		char Str[3];
-		MEMSET(&Str, 0, 3);
+		memset(&Str, 0, 3);
 		if (lpszMD5[i] == 0) 
 		{
 			sprintf_s(Str, 3, "00");

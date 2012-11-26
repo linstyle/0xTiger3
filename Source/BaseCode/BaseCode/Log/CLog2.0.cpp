@@ -1,8 +1,8 @@
 #include "CLog2.0.h"
+#include "GlobalFunction.h"
 #include <windows.h>
 #include <process.h>
 #include "MTASSERT.h"
-#include "mystdio.h"
 
 initialiseSingleton(CLogManager2);
 

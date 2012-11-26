@@ -5,7 +5,6 @@
 
 #pragma once
 #include "PacketDefine.h"
-#include "MTASSERT.h"
 #include "CLog2.0.h"
 
 /*
@@ -67,7 +66,7 @@ public:
 	IPacketObject(PACKET_DEFINE1 nPacketDefine);
 	PACKET_DEFINE1 GetPacketDefine1();
 
-	virtual void Execute(IPacketHead* pPackHead)=0;
+	virtual void Execute(IPacketHead* pPacketHead)=0;
 
 private:
 

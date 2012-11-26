@@ -4,7 +4,6 @@
 */
 
 #pragma  once
-#include "PPackets.h"
 #include "CNetDriver2.h"
 #include "CPacketFactory.h"
 /****************************
@@ -54,6 +53,7 @@ public:
 
 	unsigned int GetNetKey();
 	P_INNER_TRANSFER* GetInnerTransferPacket();
+	P_INNER_TRANSFER_ERR* GetErrInnerTransferPacket();
 
 	//网络到逻辑层，这里提升效率，不用外部拷贝，直接GetPacketBuffer()出去考别
 	bool CreateNtoL(unsigned int nNetKey);
@@ -72,6 +72,7 @@ private:
 	{
 		void* m_pUnionBuffer;
 		P_INNER_TRANSFER* m_pInnerTransfer;
+		P_INNER_TRANSFER_ERR* m_pErrInnerTransfer;
 	};
 	
 };
@@ -88,5 +89,5 @@ public:
 		g_PacketFactory.AddPacketObject(this);
 	}
 
-	virtual void Execute(IPacketHead* pPackHead) ;
+	virtual void Execute(IPacketHead* pPacketHead) ;
 };

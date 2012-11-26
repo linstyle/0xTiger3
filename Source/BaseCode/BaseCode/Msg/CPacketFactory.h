@@ -22,13 +22,13 @@ public:
 		就要返回false去断开这个连接，其中再做区分太细致。因此是否断开，由内部逻辑
 		自己控制
 	*/
-	void ProcessMsg(IPacketHead *pPackHead);
+	void ProcessMsg(IPacketHead *pPacketHead);
 
 	IPacketObject* GetPacketObject( int e );
 	
 
 private:
-	IPacketObject* GetPacketObject( IPacketHead *pPackHead );
+	IPacketObject* GetPacketObject( IPacketHead *pPacketHead );
 
 public:
 

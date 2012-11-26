@@ -1,5 +1,4 @@
 #include "CTimer.h"
-#include "mystdio.h"
 
 CTimer::CTimer()
 {

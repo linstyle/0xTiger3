@@ -1,7 +1,8 @@
-
 #include "CNetAccept.h"
 #include "CSocketAPI.h"
+#include "GlobalFunction.h"
 #include <process.h>
+
 
 CNetAccept::CNetAccept()
 {
@@ -15,13 +16,16 @@ CNetAccept::~CNetAccept()
 
 void CNetAccept::Init(CIOCP *pIOCP)
 {
-	m_hThreadAccept = NULL;
-	m_uThreadAccept= 0;
-	m_pIOCP = pIOCP;
+	INITASSERT(pIOCP);
 
-	INITASSERT(!m_pIOCP);
+	MEMSET(this, 0, sizeof(CNetAccept));
+	m_pIOCP = pIOCP;
 	
-	InitThread();
+	//有数据进来？
+	if (m_SocketServer.m_nPort)
+	{
+		InitThread();
+	}	
 }
 
 void CNetAccept::Release()

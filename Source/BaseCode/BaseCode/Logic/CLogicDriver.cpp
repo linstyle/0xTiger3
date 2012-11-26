@@ -1,43 +1,27 @@
 #include "CLogicDriver.h"
-#include "NetAPI.h"
+#include "CLog2.0.h"
+#include "CNLBridgeQueue.h"
+#include "GlobalFunction.h"
 #include "CPacketFactory.h"
-#include "CMyStackWalker.h"
 
 initialiseSingleton(CLogicDriver);
 
-
 void CLogicDriver::Loop()
 {
-	LoopGetPacketStream();
-}
+	char BufferPacket[NET_PACKET_BUFF_SIZE];
+	const char* pBuffer = BufferPacket;
 
-void CLogicDriver::LoopGetPacketStream()
-{
-	char Buffer[name_msg_packet::SOCKET_BUFF_SIZE];
-
-	while(1)
+	while (1)
 	{
-		memset(Buffer, 0, sizeof(Buffer));
-		if ( 0!=net::GetPacketStream(Buffer, sizeof(Buffer)) )
+		MEMSET(&BufferPacket, 0, sizeof(BufferPacket));
+		if ( !g_NLBridgeQueue.GetFromNetQueue(BufferPacket, NET_PACKET_BUFF_SIZE) )
 		{
 			break;
 		}
 
-		IPackHead *pPackHead = (IPackHead*)Buffer;
-		IPacketObject *pPackObject = g_PacketFactory.GetPacketObject(pPackHead);
-		if(NULL==pPackHead)
-		{
-			LOGE("CLogicDriver::LoopGetPacketStream,id:%d\n", pPackObject->GetPacketID());
-			continue;
-		}
+		IPacketHead* pPacketHead = (IPacketHead*)pBuffer;
 
-		__try
-		{
-			pPackObject->Execute(pPackHead);
-		}
-		__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
-		{
+		g_PacketFactory.ProcessMsg(pPacketHead);
 
-		}
-	}
+	}	
 }

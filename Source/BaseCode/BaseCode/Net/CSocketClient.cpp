@@ -2,7 +2,7 @@
 #include "CWindowsSlabManager.h"
 #include "CSocketAPI.h"
 #include "GlobalMacro.h"
-#include "mystdio.h"
+#include "GlobalFunction.h"
 
 
 CSocketClient*  MallocSocketClientObject()
@@ -70,11 +70,11 @@ unsigned int CSocketClient::GetKey()
 	return m_nKey;
 }
 
-int CSocketClient::Send(const char* pBuffer, int nBufferLen)
+bool CSocketClient::Send(const char* pBuffer, int nBufferLen)
 {
 	if (NULL==pBuffer)
 	{
-		return -1;
+		return false;
 	}
 
 	return m_SendBuffer.WriteBufferAtom(pBuffer, nBufferLen);
@@ -125,7 +125,7 @@ int CSocketClient::FlushSendSub()
 	return 0;
 }
 
-int CSocketClient::Recv()
+bool CSocketClient::Recv()
 {
 	InitRecv();
 	return RecvPacketStream();
@@ -157,7 +157,7 @@ void CSocketClient::InitRecv2()
 	m_WSADataBuf[1].len = i;
 }
 
-int CSocketClient::RecvPacketStream()
+bool CSocketClient::RecvPacketStream()
 {
 	int nResult;
 	DWORD dwRecvBytes;
@@ -172,11 +172,11 @@ int CSocketClient::RecvPacketStream()
 				@一种是套接字本身异常，这里直接设置
 				@一种是投递后接收到的异常，比如关闭等等。
 			*/
-			return -1;
+			return false;
 		}
 	}
 
-	return 0;
+	return true;
 }
 
 int CSocketClient::Connect()

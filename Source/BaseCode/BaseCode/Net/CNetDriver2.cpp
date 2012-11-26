@@ -51,14 +51,14 @@ bool CNetDriver2::CloseNet(unsigned int nNetKey)
 	return SendPacket(&msgInnerTransfer);
 }
 
-bool CNetDriver2::SendPacket(IPacketHead* pPackHead)
+bool CNetDriver2::SendPacket(IPacketHead* pPacketHead)
 {
-	IFn(!pPackHead)
+	IFn(!pPacketHead)
 		return false;
 
 	__try
 	{
-		return g_NLBridgeQueue.PutToNetQueue(pPackHead);
+		return g_NLBridgeQueue.PutToNetQueue(pPacketHead);
 	}
 	__except (ExpFilter(GetExceptionInformation(), GetExceptionCode()))
 	{

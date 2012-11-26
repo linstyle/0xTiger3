@@ -20,8 +20,6 @@
 #include "CNetKernel.h"
 #include "CNetAccept.h"
 #include "CNLBridgeQueue.h"
-#include "CMyStackWalker.h"
-#include "PPackets.h"
 
 enum
 {
@@ -54,7 +52,7 @@ public:
 	bool CloseNet(unsigned int nNetKey);
 
 	//int GetPacketStream(char *pBuffer, int nBufferLen);
-	bool SendPacket(IPacketHead* pPackHead);
+	bool SendPacket(IPacketHead* pPacketHead);
 
 	CNetKernel* GetNetKerner();
 

@@ -11,6 +11,7 @@
 #include "Clog2.0.h"
 #include "CPacketFactory.h"
 #include "CCmInitPackets.h"
+#include "CLogicDriver.h"
 //#include "CThreadPool.h"
 //#include "CThreadQuit.h"
 //#include "CNetTransToLogic.h"

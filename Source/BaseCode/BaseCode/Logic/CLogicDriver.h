@@ -13,7 +13,6 @@ public:
 	void Loop();
 
 private:
-	void LoopGetPacketStream();
 
 public:
 

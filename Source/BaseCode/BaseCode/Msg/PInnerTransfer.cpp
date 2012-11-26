@@ -26,6 +26,11 @@ P_INNER_TRANSFER* PInnerTransfer::GetInnerTransferPacket()
 	return m_pInnerTransfer;
 }
 
+P_INNER_TRANSFER_ERR* PInnerTransfer::GetErrInnerTransferPacket()
+{
+	return m_pErrInnerTransfer;
+}
+
 
 bool PInnerTransfer::CreateNtoL(unsigned int nNetKey)
 {
@@ -40,11 +45,11 @@ bool PInnerTransfer::CreateNtoL(unsigned int nNetKey)
 
 bool PInnerTransfer::CreateNtoLErr(unsigned int nNetKey)
 {
-	m_pInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
-	m_pInnerTransfer->m_nPacketDefine2 = D2_INNER_N_TO_L_ERR;
-	m_pInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER_ERR);
+	m_pErrInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
+	m_pErrInnerTransfer->m_nPacketDefine2 = D2_INNER_N_TO_L_ERR;
+	m_pErrInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER_ERR);
 
-	m_pInnerTransfer->m_nNetKey = nNetKey;	
+	m_pErrInnerTransfer->m_nNetKey = nNetKey;	
 
 	return true;
 }
@@ -68,11 +73,11 @@ bool PInnerTransfer::CreateLtoN(unsigned int nNetKey, const char* pLogicPacket, 
 
 bool PInnerTransfer::CreateLtoNErr(unsigned int nNetKey)
 {
-	m_pInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
-	m_pInnerTransfer->m_nPacketDefine2 = D2_INNER_L_TO_N_ERR;
-	m_pInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER_ERR);
+	m_pErrInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
+	m_pErrInnerTransfer->m_nPacketDefine2 = D2_INNER_L_TO_N_ERR;
+	m_pErrInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER_ERR);
 
-	m_pInnerTransfer->m_nNetKey = nNetKey;
+	m_pErrInnerTransfer->m_nNetKey = nNetKey;
 
 	return true;
 }
@@ -81,12 +86,12 @@ bool PInnerTransfer::CreateLtoNErr(unsigned int nNetKey)
 /****************************
 	IPacketObject
 *****************************/
-void POInnerTransfer::Execute(IPacketHead* pPackHead)
+void POInnerTransfer::Execute(IPacketHead* pPacketHead)
 {
-	IFn(!pPackHead)
+	IFn(!pPacketHead)
 		return;
 
-	PInnerTransfer* pPInnerTransfer = (PInnerTransfer*)pPackHead;
+	PInnerTransfer* pPInnerTransfer = (PInnerTransfer*)pPacketHead;
 	IFn(!pPInnerTransfer)
 		return;
 
@@ -94,35 +99,25 @@ void POInnerTransfer::Execute(IPacketHead* pPackHead)
 	IFn(!pNetKernel)
 		return; 
 
-	bool bResult = false;
-	switch(pPackHead->GetPacketDefine2())
+	switch(pPacketHead->GetPacketDefine2())
 	{
 	case D2_INNER_N_TO_L_SEND:
-
+		g_PacketFactory.ProcessMsg( (IPacketHead*)(pPInnerTransfer->GetInnerTransferPacket()) );
 		break;
 
 	case D2_INNER_N_TO_L_ERR:
 		break;
 
 	case D2_INNER_L_TO_N_SEND:
-		bResult = pNetKernel->SendToBufferByNetKey( (IPacketHead*)(pPInnerTransfer->GetInnerTransferPacket()), 
+		pNetKernel->SendToBufferByNetKey( (IPacketHead*)(pPInnerTransfer->GetInnerTransferPacket()), 
 			pPInnerTransfer->GetNetKey());
 		break;
 
 	case D2_INNER_L_TO_N_ERR:
-		bResult = true;
 		pNetKernel->CloseClientSocketByNetKey(pPInnerTransfer->GetNetKey());
 		break;
 
 	default:
-		LOGE("POInnerTransfer::Execute.PacketDefin2:%d\n", pPackHead->GetPacketDefine2());
-		bResult = true;
+		LOGE("POInnerTransfer::Execute.PacketDefin2:%d\n", pPacketHead->GetPacketDefine2());
 	}
-
-	if (!bResult)
-	{
-		LOGE("POInnerTransfer::Execute(IPacketHead* pPackHead) return false.PacketDefin2:%d\n", 
-			pPackHead->GetPacketDefine2());
-	}
-
 }

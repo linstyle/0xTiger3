@@ -1,4 +1,3 @@
-
 #include "NetAPI.h"
 
 
@@ -18,9 +17,9 @@ void net::Init()
 }
 
 
-int net::SendPacket(IPacketHead* pPackHead)
+int net::SendPacket(IPacketHead* pPacketHead)
 {
-	return g_NetDriver2.SendPacket(pPackHead);
+	return g_NetDriver2.SendPacket(pPacketHead);
 }
 
 

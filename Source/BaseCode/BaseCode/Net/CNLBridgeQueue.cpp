@@ -1,5 +1,5 @@
 #include "CNLBridgeQueue.h"
-
+#include "MTASSERT.h"
 
 initialiseSingleton(CNLBridgeQueue);
 

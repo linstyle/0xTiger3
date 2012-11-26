@@ -1,6 +1,7 @@
 #include "CPacketFactory.h"
+#include "GlobalFunction.h"
 #include "CLog2.0.h"
-#include "mystdio.h"
+
 
 initialiseSingleton(CPacketFactory);
 
@@ -32,37 +33,37 @@ IPacketObject* CPacketFactory::GetPacketObject( int e )
 	return m_Factory[e];
 }
 
-IPacketObject* CPacketFactory::GetPacketObject( IPacketHead *pPackHead )
+IPacketObject* CPacketFactory::GetPacketObject( IPacketHead *pPacketHead )
 {
-	IFn(NULL==pPackHead)
+	IFn(NULL==pPacketHead)
 		return NULL;
 
-	return GetPacketObject(pPackHead->GetPacketDefine1());
+	return GetPacketObject(pPacketHead->GetPacketDefine1());
 }
 
-void CPacketFactory::ProcessMsg(IPacketHead *pPackHead)
+void CPacketFactory::ProcessMsg(IPacketHead *pPacketHead)
 {
-	IFn(NULL==pPackHead)
+	IFn(NULL==pPacketHead)
 		return;
 
-	IPacketObject* pPacketObject = g_PacketFactory.GetPacketObject(pPackHead);	
+	IPacketObject* pPacketObject = g_PacketFactory.GetPacketObject(pPacketHead);	
 	IFn(NULL==pPacketObject)
 	{
 		//协议没有？
 		LOGNE("CPacketFactory::ProcessMsg,NULL==pPacketObject. PACKET_DEFINE1:%d,  \
-			PACKET_DEFINE2:%d\n", pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());
+			PACKET_DEFINE2:%d\n", pPacketHead->GetPacketDefine1(), pPacketHead->GetPacketDefine2());
 		return;
 	}
 
-	IFn(pPackHead->GetPacketDefine1()!=pPacketObject->GetPacketDefine1())
+	IFn(pPacketHead->GetPacketDefine1()!=pPacketObject->GetPacketDefine1())
 	{
 		//协议不一致？
 		//协议没有？
-		LOGNE("CPacketFactory::ProcessMsg,pPackHead->Define1!=pPacketObject->Define1. PACKET_DEFINE1:%d,  \
-			  PACKET_DEFINE2:%d\n", pPackHead->GetPacketDefine1(), pPackHead->GetPacketDefine2());
+		LOGNE("CPacketFactory::ProcessMsg,pPacketHead->Define1!=pPacketObject->Define1. PACKET_DEFINE1:%d,  \
+			  PACKET_DEFINE2:%d\n", pPacketHead->GetPacketDefine1(), pPacketHead->GetPacketDefine2());
 		return;
 	}
 
 	
-	pPacketObject->Execute(pPackHead);
+	pPacketObject->Execute(pPacketHead);
 }

@@ -7,9 +7,6 @@
 
 #include "Singleton.h"
 
-//#include "PInnerTransfer.h"
-//#include "PLogin.h"
-
 class CCmInitPackets:public Singleton<CCmInitPackets>
 {
 public:

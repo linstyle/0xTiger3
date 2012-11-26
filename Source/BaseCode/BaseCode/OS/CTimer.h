@@ -12,6 +12,7 @@
 #pragma once
 
 #include "LinuxList.h"
+#include "GlobalFunction.h"
 #include <stdio.h>
 #include <windows.h>
 

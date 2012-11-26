@@ -47,8 +47,8 @@ public:
 	void Init();
 
 	int Connect();
-	int Recv();
-	int Send(const char* pBuffer, int nBufferLen);
+	bool Recv();
+	bool Send(const char* pBuffer, int nBufferLen);
 	int FlushSend();
 
 	unsigned int GetKey();
@@ -62,7 +62,7 @@ private:
 	void InitRecv();
 	void InitRecv1();
 	void InitRecv2();
-	int  RecvPacketStream();
+	bool RecvPacketStream();
 
 public:
 	SOCKET m_nSocket;

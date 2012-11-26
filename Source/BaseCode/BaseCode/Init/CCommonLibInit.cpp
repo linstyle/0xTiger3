@@ -26,6 +26,9 @@ CCommonLibInit::CCommonLibInit()
 	new CCmInitPackets;						//公共协议包
 	printf("Notic, CCommonLibInit::CCommonLibInit():New CCmInitPackets OK\n");
 
+	new CLogicDriver;                       //逻辑层驱动
+	printf("Notic, CCommonLibInit::CCommonLibInit():New CLogicDriver OK\n");
+
 	//new CObjectMapManager;              //网络对象管理
 	//printf("Notic, CCommonLibInit::CCommonLibInit():New CNetObjectManager OK\n");
 
@@ -47,6 +50,9 @@ CCommonLibInit::CCommonLibInit()
 
 CCommonLibInit::~CCommonLibInit()
 {
+	delete CLogicDriver::getSingletonPtr();  //公共协议包
+	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CLogicDriver OK\n");
+
 	delete CCmInitPackets::getSingletonPtr();  //公共协议包
 	printf("Notic, CCommonLibInit::~CCommonLibInit():Delete CCmInitPackets OK\n");
 

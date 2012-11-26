@@ -526,6 +526,14 @@
 		<Filter
 			Name="Logic"
 			>
+			<File
+				RelativePath=".\Logic\CLogicDriver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Logic\CLogicDriver.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="LogicPlayer"
@@ -634,14 +642,6 @@
 				RelativePath=".\OS\CTimer.h"
 				>
 			</File>
-			<File
-				RelativePath=".\OS\mystdio.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OS\mystdio.h"
-				>
-			</File>
 			<Filter
 				Name="slab"
 				>
@@ -723,10 +723,14 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\ClassDiagram1.cd"
+		<Filter
+			Name="Include"
 			>
-		</File>
+			<File
+				RelativePath=".\Include\BaseCodeInclude.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
 			>

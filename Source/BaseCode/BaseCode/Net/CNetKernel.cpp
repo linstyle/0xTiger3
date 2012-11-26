@@ -1,8 +1,8 @@
 #include "CNetKernel.h"
 #include "CNLBridgeQueue.h"
 #include "GlobalMacro.h"
+#include "GlobalFunction.h"
 #include "CSocketAPI.h"
-#include "mystdio.h"
 #include "CPacketFactory.h"
 #include "PInnerTransfer.h"
 #include <process.h>
@@ -74,15 +74,22 @@ bool CNetKernel::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, b
 bool CNetKernel::SendToBufferByNetKey(IPacketHead* pPacketHead, unsigned int nNetKey)
 {
 	CSocketClient *pSocketClient = GetSocketClientByKey(nNetKey);
-	IFn(NULL==pSocketClient)
+	if(NULL==pSocketClient)
 	{
+		LOGE("CNetKernel::SendToBufferByNetKey.pSocketClient NULL Point.nNetKey:%d", nNetKey);
 		return false;
 	}
 
+	IFn(!pPacketHead)
+		return false;
 
-	IFn(-1==pSocketClient->Send(pPacketHead->GetPacketBuffer(), pPacketHead->GetPacketSize()) )
+
+	if(!pSocketClient->Send(pPacketHead->GetPacketBuffer(), pPacketHead->GetPacketSize()) )
 	{
-		CloseClientSocket(pSocketClient);
+		//包队列满了，不一定要关闭
+		//CloseClientSocket(pSocketClient);
+		LOGE("CNetKernel::SendToBufferByNetKey.Buffer Over.PacketDefin1:%d, PacketDefin2:%d\n", 
+			pPacketHead->GetPacketDefine1(), pPacketHead->GetPacketDefine2());
 		return false;
 	}	
 
@@ -298,7 +305,6 @@ void CNetKernel::LoopConnect()
 
 void CNetKernel::LoopBridgeQueue()
 {
-	int nResult=0;
 	char BufferPacket[NET_PACKET_BUFF_SIZE];
 	const char* pBuffer = BufferPacket;
 
@@ -310,9 +316,9 @@ void CNetKernel::LoopBridgeQueue()
 			break;
 		}
 		
-		IPacketHead* pPackHead = (IPacketHead*)pBuffer;
+		IPacketHead* pPacketHead = (IPacketHead*)pBuffer;
 
-		g_PacketFactory.ProcessMsg(pPackHead);
+		g_PacketFactory.ProcessMsg(pPacketHead);
 
 	}
 }

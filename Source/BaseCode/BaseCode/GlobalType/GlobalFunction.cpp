@@ -1,5 +1,5 @@
 #include "GlobalFunction.h"
-#include <Winsock2.h>
+
 unsigned long inet_addr_w(const wchar_t *pSrcIP)
 {
 	char  CharIP[128]={0};

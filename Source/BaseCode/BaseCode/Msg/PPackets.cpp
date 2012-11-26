@@ -1,7 +1,5 @@
 #include "PPackets.h"
-#include "MTASSERT.h"
-#include "mystdio.h"
-
+#include "GlobalFunction.h"
 
 IPacketHead::IPacketHead()
 {

@@ -1,6 +1,5 @@
 #include "CMGuid.h"
-#include "mystdio.h"
-
+#include "GlobalFunction.h"
 
 initialiseSingleton(CMGuid);
 

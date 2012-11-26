@@ -1,5 +1,4 @@
 #include "CSingleBuffer.h"
-#include "mystdio.h"
 
 CSingleBuffer::CSingleBuffer()
 {

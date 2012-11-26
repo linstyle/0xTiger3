@@ -1,7 +1,6 @@
 #include "CSocketServer.h"
 #include "GlobalMacro.h"
-#include "mystdio.h"
-
+#include "GlobalFunction.h"
 
 CSocketServer::CSocketServer()
 {
@@ -15,14 +14,14 @@ CSocketServer::~CSocketServer()
 
 void CSocketServer::Init()
 {
-	MEMSET(&m_szName, 0, sizeof(m_szName));	
-	m_nIP = 0;
-	m_nPort = 0;
-	m_nSocket = 0;
+	MEMSET(this, 0, sizeof(CSocketServer));	
+	//m_nIP = 0;
+	//m_nPort = 0;
+	//m_nSocket = 0;
 
 	//OS API需要
-	MEMSET(&m_OverlappedAccept, 0, sizeof(m_OverlappedAccept));
-//	LPFN_ACCEPTEX m_lpfnAcceptEx;	外部初始化
+	//MEMSET(&m_OverlappedAccept, 0, sizeof(m_OverlappedAccept));
+	//LPFN_ACCEPTEX m_lpfnAcceptEx;	外部初始化
 }
 
 bool CSocketServer::Accept(CSocketClient *pSocketClient)
