@@ -8,10 +8,13 @@
 
 namespace net  
 {
+	/*
+		注意调用顺序，Init在SetSocketServer和AddConnectSocket后调用
+	*/
 	bool SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);	
 	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort);
 	void Init();
 
-	int SendPacket(IPacketHead* pPacketHead);
-	bool CloseNet(unsigned int nNetKey);
+	int SendPacket(IPacketHead* pPacketHead, CBasePlayer* pBasePlayer);
+	bool CloseNet(CBasePlayer* pBasePlayer);
 };

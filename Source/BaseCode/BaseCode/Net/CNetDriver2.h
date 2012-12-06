@@ -14,12 +14,14 @@
 */
 
 #pragma  once
+
 #include "Singleton.h"
 #include "CSocketClient.h"
 #include "CSocketServer.h"
 #include "CNetKernel.h"
 #include "CNetAccept.h"
 #include "CNLBridgeQueue.h"
+#include "CBasePlayer.h"
 
 enum
 {
@@ -49,10 +51,10 @@ public:
 		@通知网络层，逻辑层有错误发生
 		@nNetKey:网络层传递给逻辑岑的标识
 	*/
-	bool CloseNet(unsigned int nNetKey);
+	bool CloseNet(CBasePlayer* pBasePlayer);
 
 	//int GetPacketStream(char *pBuffer, int nBufferLen);
-	bool SendPacket(IPacketHead* pPacketHead);
+	bool SendPacket(IPacketHead* pPacketHead, CBasePlayer* pBasePlayer);
 
 	CNetKernel* GetNetKerner();
 

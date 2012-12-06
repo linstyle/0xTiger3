@@ -59,37 +59,6 @@ bool CNLBridgeQueue::PutToLogicQueue(IPacketHead* pPacketHead)
 	}
 
 	return true;
-
-	//IFn(NULL==pRecvBuffer)
-	//{
-	//	return -1;
-	//}
-
-	//IPacketHead PackHead;
-	//char BufferPacket[NET_PACKET_BUFF_SIZE]={0};
-
-	////读头部数据大小字段
-	//if( -1==pRecvBuffer->TryReadBuffer((char*)&PackHead,  NET_PACKET_HEAD_SIZE) )
-	//{
-	//	return 1;
-	//}
-
-	////打包投入到m_ToLogicQueue
-	//if( !m_pLogicTaskQueue->WriteBufferAtom(BufferPacket, PackHead.GetPacketSize()) )
-	//{
-	//	return 1;
-	//}
-	//
-	////记得刷
-	//pRecvBuffer->ReadBufferFlush(PackHead.GetPacketSize());
-
-	////长度我随便写的，体检检测下空间大小，如果不够直接投递，不必等到下次
-	//if (pRecvBuffer->GetUseLength() < (NET_PACKET_HEAD_SIZE * 2)) 
-	//{
-	//	return 1;
-	//}
-
-	//return 0;
 }
 
 

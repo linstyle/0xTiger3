@@ -16,7 +16,7 @@ CNetAccept::~CNetAccept()
 
 void CNetAccept::Init(CIOCP *pIOCP)
 {
-	INITASSERT(pIOCP);
+	INITASSERT(!pIOCP);
 
 	MEMSET(this, 0, sizeof(CNetAccept));
 	m_pIOCP = pIOCP;

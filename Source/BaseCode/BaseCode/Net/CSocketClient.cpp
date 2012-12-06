@@ -191,8 +191,10 @@ int CSocketClient::Connect()
 	*/
 	int nResult;
 	nResult = CSocketAPI::ConnectNonb(m_nSocket, (sockaddr*)&m_ConnectAddr, sizeof(m_ConnectAddr), 0);
-	IFn( -1==nResult )
+	if( -1==nResult )
 	{
+		LOGNW("CSocketClient::Connect Failed.ErrNO:%d, IP:%s, Port:%d\n",
+			WSAGetLastError(), inet_ntoa(m_ConnectAddr.sin_addr), m_nPort);
 		return -1;
 	}
 

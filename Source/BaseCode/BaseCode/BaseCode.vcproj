@@ -117,7 +117,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\BaseCode;OS;OS\slab;Algorithm;Exception;GlobalType;Guid;Init;Log;Logic;LogicPlayer;Msg;Net;Network;ObjectMapManager"
+				AdditionalIncludeDirectories="..\BaseCode;OS;OS\slab;Algorithm;Exception;GlobalType;Guid;Init;Log;Logic;Player;Msg;Net;Network;ObjectMapManager"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -536,8 +536,16 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LogicPlayer"
+			Name="Player"
 			>
+			<File
+				RelativePath=".\Player\CBasePlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Player\CBasePlayer.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Net"

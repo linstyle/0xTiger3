@@ -17,13 +17,13 @@ void net::Init()
 }
 
 
-int net::SendPacket(IPacketHead* pPacketHead)
+int net::SendPacket(IPacketHead* pPacketHead, CBasePlayer* pBasePlayer)
 {
-	return g_NetDriver2.SendPacket(pPacketHead);
+	return g_NetDriver2.SendPacket(pPacketHead, pBasePlayer);
 }
 
 
-bool net::CloseNet(unsigned int nNetKey)
+bool net::CloseNet(CBasePlayer* pBasePlayer)
 {
-	return g_NetDriver2.CloseNet(nNetKey);
+	return g_NetDriver2.CloseNet(pBasePlayer);
 }

@@ -20,7 +20,7 @@ CNetDriver2::~CNetDriver2()
 
 bool CNetDriver2::SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
 {
-	IFn(m_bHasInit)
+	IF(m_bHasInit)
 		return false;
 
 	INITASSERT(!pName || !pListenIP);
@@ -32,7 +32,7 @@ bool CNetDriver2::SetSocketServer(const char* pName, const char* pListenIP, USHO
 
 bool CNetDriver2::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 {
-	IFn(m_bHasInit)
+	IF(m_bHasInit)
 		return false;
 
 	INITASSERT(!pConnectIP);
@@ -42,18 +42,21 @@ bool CNetDriver2::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 	return true;
 }
 
-bool CNetDriver2::CloseNet(unsigned int nNetKey)
+bool CNetDriver2::CloseNet(CBasePlayer* pBasePlayer)
 {
-	PInnerTransfer msgInnerTransfer;
-	IFn(!msgInnerTransfer.CreateLtoNErr(nNetKey))
+	IF(!pBasePlayer)
 		return false;
 
-	return SendPacket(&msgInnerTransfer);
+	PInnerTransfer msgInnerTransfer;
+	IF(!msgInnerTransfer.CreateLtoNErr( pBasePlayer->GetNetKey() ))
+		return false;
+
+	return SendPacket(&msgInnerTransfer, pBasePlayer);
 }
 
-bool CNetDriver2::SendPacket(IPacketHead* pPacketHead)
+bool CNetDriver2::SendPacket(IPacketHead* pPacketHead, CBasePlayer* pBasePlayer)
 {
-	IFn(!pPacketHead)
+	IF(!pPacketHead || !pBasePlayer)
 		return false;
 
 	__try
@@ -68,7 +71,7 @@ bool CNetDriver2::SendPacket(IPacketHead* pPacketHead)
 
 //int CNetDriver2::GetPacketStream(char *pBuffer, int nBufferLen)
 //{
-//	IFn(!pBuffer)
+//	IF(!pBuffer)
 //		return -1;
 //
 //	__try
