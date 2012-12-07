@@ -62,7 +62,8 @@ void CSocketClient::Init()
 
 	m_RecvBuffer.Init(socket_circle_config::RECV_CIRCLE_LEN);
 	m_SendBuffer.Init(socket_circle_config::SEND_CIRCLE_LEN);
-	INIT_LIST_HEAD(&m_lNode);
+	INIT_LIST_HEAD(&m_lConnectNode);
+	INIT_LIST_HEAD(&m_lAllSocketClient);
 }
 
 unsigned int CSocketClient::GetKey()

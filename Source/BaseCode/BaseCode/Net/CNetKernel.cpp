@@ -115,8 +115,8 @@ void CNetKernel::AddClientSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	m_lConnect.Add(&pSocketClient->m_lNode);
-	m_lSocketClient.Add(&pSocketClient->m_lNode);
+	m_lstConnect.Add(&pSocketClient->m_lConnectNode);
+	m_lstAllSocketClient.Add(&pSocketClient->m_lAllSocketClient);
 	m_HashSocketClient.insert(pair<unsigned int, CSocketClient*>(pSocketClient->GetKey(),pSocketClient));
 }
 
@@ -144,13 +144,13 @@ void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogi
 
 	if(pSocketClient->m_bAutoConnect)
 	{
-		m_lSocketClient.Del(&pSocketClient->m_lNode);
-		m_lConnect.Add(&pSocketClient->m_lNode);
+		m_lstAllSocketClient.Del(&pSocketClient->m_lAllSocketClient);
+		m_lstConnect.Add(&pSocketClient->m_lConnectNode);
 		return;
 	}
 
 	CSocketAPI::Close(pSocketClient->m_nSocket);
-	m_lSocketClient.Del(&pSocketClient->m_lNode);
+	m_lstAllSocketClient.Del(&pSocketClient->m_lAllSocketClient);
 	m_HashSocketClient.erase(pSocketClient->GetKey());
 
 	//最后Free掉
@@ -268,9 +268,9 @@ void CNetKernel::LoopSendData()
 	CSocketClient *pSocketClient;
 	list_head *pListIte;
 
-	list_for_each(pListIte,  &m_lSocketClient.m_lHead)
+	list_for_each(pListIte,  &m_lstAllSocketClient.m_lHead)
 	{
-		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lNode);
+		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lAllSocketClient);
 		//send
 		IFn( -1==pSocketClient->FlushSend())
 		{
@@ -286,14 +286,14 @@ void CNetKernel::LoopConnect()
 	list_head *pListIteTemp;
 	CSocketClient *pSocketClient;
 
-	list_for_each_safe(pListIte, pListIteTemp, &m_lConnect.m_lHead)
+	list_for_each_safe(pListIte, pListIteTemp, &m_lstConnect.m_lHead)
 	{
-		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lNode);
+		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lConnectNode);
 
 		//虽然是无阻塞连接，但是不适合大量断连，服务端需要重连的场景
 		if ( 0==pSocketClient->Connect() )
 		{
-			m_lConnect.Del(pListIte);
+			m_lstConnect.Del(pListIte);
 			//连接成功
 			IFn(-1==pSocketClient->Recv())
 			{				

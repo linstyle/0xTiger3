@@ -89,7 +89,12 @@ public:
 	//传递给逻辑层的key,直接用地址的话，因为是异步的，怕重复
 	unsigned int m_nKey;
 
-	struct list_head m_lNode;
+	/*
+		m_lConnectNode:  CNetKernel:m_lstConnect使用
+		m_lConnectNode:  CNetKernel:m_lstAllSocketClient使用
+	*/
+	struct list_head m_lConnectNode;
+	struct list_head m_lAllSocketClient;
 private:
 
 };

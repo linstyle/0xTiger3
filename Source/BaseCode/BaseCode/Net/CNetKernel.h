@@ -90,7 +90,8 @@ private:
 	HASH_SOCKETCLIENT m_HashSocketClient;
 
 	//需要重连的套接字
-	CList m_lConnect;
+	CList m_lstConnect;
+
 	//管理所有连接的链表
-	CList m_lSocketClient;
+	CList m_lstAllSocketClient;
 };

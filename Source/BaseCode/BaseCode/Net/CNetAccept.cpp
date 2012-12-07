@@ -6,7 +6,7 @@
 
 CNetAccept::CNetAccept()
 {
-	
+	MEMSET(this, 0, sizeof(CNetAccept));
 }
 
 CNetAccept::~CNetAccept()
@@ -18,7 +18,7 @@ void CNetAccept::Init(CIOCP *pIOCP)
 {
 	INITASSERT(!pIOCP);
 
-	MEMSET(this, 0, sizeof(CNetAccept));
+	
 	m_pIOCP = pIOCP;
 	
 	//有数据进来？
