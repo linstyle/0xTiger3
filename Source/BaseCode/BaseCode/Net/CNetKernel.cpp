@@ -67,6 +67,8 @@ bool CNetKernel::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, b
 	pSocketClient->m_bAutoConnect = bAutoConnect;
 	pSocketClient->m_nPort = nConnectPort;
 	pSocketClient->m_nIP = inet_addr(pConnectIP);
+	m_lstConnect.Add(&pSocketClient->m_lConnectNode);
+
 	AddClientSocket(pSocketClient);
 	return true;
 }
@@ -115,7 +117,7 @@ void CNetKernel::AddClientSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	m_lstConnect.Add(&pSocketClient->m_lConnectNode);
+	
 	m_lstAllSocketClient.Add(&pSocketClient->m_lAllSocketClient);
 	m_HashSocketClient.insert(pair<unsigned int, CSocketClient*>(pSocketClient->GetKey(),pSocketClient));
 }

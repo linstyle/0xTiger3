@@ -19,11 +19,7 @@ CSocketClient*  MallocSocketClientObject()
 	//return pSocketClient;
 
 	CSocketClient *pSocketClient = new CSocketClient;
-	
-	if (pSocketClient)
-	{
-		pSocketClient->m_nKey = SOCKET_KEY_SEED++;
-	}
+
 	return pSocketClient;
 }
 void  FreeSocketClientObject(CSocketClient* p)
@@ -44,8 +40,6 @@ CSocketClient::CSocketClient()
 {
 	memset(this, 0, sizeof(CSocketClient));
 
-	m_nKey = 0;
-	m_bAutoConnect = false;
 	Init();
 }
 
@@ -59,6 +53,9 @@ void CSocketClient::Init()
 	m_nIP = 0;
 	m_nPort = 0;
 	m_nSocket = 0;
+
+	m_nKey = SOCKET_KEY_SEED++;
+	m_bAutoConnect = false;
 
 	m_RecvBuffer.Init(socket_circle_config::RECV_CIRCLE_LEN);
 	m_SendBuffer.Init(socket_circle_config::SEND_CIRCLE_LEN);
