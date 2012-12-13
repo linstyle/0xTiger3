@@ -13,6 +13,7 @@ CNetKernel::CNetKernel()
 	m_bThreadRun = true;
 	m_hThreadLoop = NULL;
 	m_uThreadLoop = 0;
+	m_bHasInitSocket = false;
 }
 
 CNetKernel::~CNetKernel()
@@ -23,7 +24,12 @@ CNetKernel::~CNetKernel()
 void CNetKernel::Init()
 {
 	INITASSERT(!m_IOCP.Create());
-	InitThread();
+
+	if (m_bHasInitSocket)
+	{
+		InitThread();
+	}
+	
 }
 
 void CNetKernel::InitThread()
@@ -35,10 +41,38 @@ void CNetKernel::InitThread()
 void CNetKernel::Release()
 {
 	ReleaseThread();
+	ReleaseSocket();
+}
+
+void CNetKernel::ReleaseSocket()
+{
+	CSocketClient* pSocketClient = NULL;
+	MAP_SOCKETCLIENT::iterator ite;
+	for( ite=m_mapAllClientSocket.begin(); ite!=m_mapAllClientSocket.end(); )
+	{
+		pSocketClient = ite->second;
+		pSocketClient->m_bAutoConnect = false;
+		CloseClientSocket(pSocketClient);
+	}
+
+	list_head *pListIte;
+	list_head *pListIteTemp;
+	list_for_each_safe(pListIte, pListIteTemp, &m_lstConnect.m_lHead)
+	{
+		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lConnectNode);
+
+		pSocketClient->m_bAutoConnect = false;
+		FreeSocketClientObject(pSocketClient);
+	}
 }
 
 void CNetKernel::ReleaseThread()
 {
+	if (!m_hThreadLoop)
+	{
+		return;
+	}
+
 	m_bThreadRun = false;
 
 	IFn( WAIT_FAILED==WaitForSingleObject(m_hThreadLoop, INFINITE) )
@@ -53,7 +87,7 @@ CIOCP* CNetKernel::GetIOCP()
 	return &m_IOCP;
 }
 
-bool CNetKernel::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect)
+bool CNetKernel::CreateConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect)
 {
 	IFn(!pConnectIP)
 		return false;
@@ -69,7 +103,8 @@ bool CNetKernel::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, b
 	pSocketClient->m_nIP = inet_addr(pConnectIP);
 	m_lstConnect.Add(&pSocketClient->m_lConnectNode);
 
-	AddClientSocket(pSocketClient);
+	m_bHasInitSocket = true;
+
 	return true;
 }
 
@@ -117,9 +152,7 @@ void CNetKernel::AddClientSocket(CSocketClient *pSocketClient)
 		return;
 	}
 
-	
-	m_lstAllSocketClient.Add(&pSocketClient->m_lAllSocketClient);
-	m_HashSocketClient.insert(pair<unsigned int, CSocketClient*>(pSocketClient->GetKey(),pSocketClient));
+	m_mapAllClientSocket.insert(pair<unsigned int, CSocketClient*>(pSocketClient->GetKey(),pSocketClient));
 }
 
 void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogic/*=true*/)
@@ -146,14 +179,13 @@ void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogi
 
 	if(pSocketClient->m_bAutoConnect)
 	{
-		m_lstAllSocketClient.Del(&pSocketClient->m_lAllSocketClient);
+		m_mapAllClientSocket.erase(pSocketClient->GetKey());
 		m_lstConnect.Add(&pSocketClient->m_lConnectNode);
 		return;
 	}
 
 	CSocketAPI::Close(pSocketClient->m_nSocket);
-	m_lstAllSocketClient.Del(&pSocketClient->m_lAllSocketClient);
-	m_HashSocketClient.erase(pSocketClient->GetKey());
+	
 
 	//最后Free掉
 	FreeSocketClientObject(pSocketClient);
@@ -177,7 +209,7 @@ void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogi
 bool CNetKernel::VerifySocketClientValid(unsigned int nSocketKey)
 {
 	//判断该对象是否还存在
-	if (m_HashSocketClient.end()==m_HashSocketClient.find(nSocketKey))
+	if (m_mapAllClientSocket.end()==m_mapAllClientSocket.find(nSocketKey))
 	{
 		return false;
 	}
@@ -187,9 +219,9 @@ bool CNetKernel::VerifySocketClientValid(unsigned int nSocketKey)
 
 CSocketClient* CNetKernel::GetSocketClientByKey(unsigned int nSocketKey)
 {
-	HASH_SOCKETCLIENT::iterator ite = m_HashSocketClient.find(nSocketKey);
+	MAP_SOCKETCLIENT::iterator ite = m_mapAllClientSocket.find(nSocketKey);
 
-	if(ite==m_HashSocketClient.end())
+	if(ite==m_mapAllClientSocket.end())
 	{
 		return NULL;
 	}
@@ -267,19 +299,22 @@ bool CNetKernel::_LoopIOCP()
 
 void CNetKernel::LoopSendData()
 {
-	CSocketClient *pSocketClient;
-	list_head *pListIte;
+	CSocketClient *pSocketClient = NULL;
+	MAP_SOCKETCLIENT::iterator ite;
 
-	list_for_each(pListIte,  &m_lstAllSocketClient.m_lHead)
+	for( ite=m_mapAllClientSocket.begin(); ite!=m_mapAllClientSocket.end(); )
 	{
-		pSocketClient = list_entry_offset(pListIte, CSocketClient, m_lAllSocketClient);
-		//send
+		pSocketClient = ite->second;
 		IFn( -1==pSocketClient->FlushSend())
 		{
-			
+			CloseClientSocket(pSocketClient);
+			ite = m_mapAllClientSocket.erase(ite);
 		}
-
-	}//end list_for_each
+		else
+		{
+			ite++;
+		}
+	}
 }
 
 void CNetKernel::LoopConnect()
@@ -296,6 +331,7 @@ void CNetKernel::LoopConnect()
 		if ( 0==pSocketClient->Connect() )
 		{
 			m_lstConnect.Del(pListIte);
+			AddClientSocket(pSocketClient);
 			//连接成功
 			IFn(-1==pSocketClient->Recv())
 			{				

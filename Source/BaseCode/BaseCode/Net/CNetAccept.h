@@ -15,7 +15,7 @@ public:
 	~CNetAccept();
 	
 	void Init(CIOCP *pIOCP);
-	bool SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);
+	bool CreateServerSocket(const char* pName, const char* pListenIP, USHORT nListenPort);
 	CSocketServer* GetSocketServer();
 	
 private:
@@ -33,6 +33,7 @@ private:
 public:
 
 private:
+	bool m_bHasInitSocket;
 	//Ïß³Ì
 	HANDLE m_hThreadAccept;
 	volatile bool m_bThreadRun;	

@@ -6,7 +6,11 @@
 
 CNetAccept::CNetAccept()
 {
-	MEMSET(this, 0, sizeof(CNetAccept));
+	m_bHasInitSocket = false;
+	m_hThreadAccept = NULL;
+	m_bThreadRun = true;
+	m_uThreadAccept = 0;
+	m_pIOCP = NULL;
 }
 
 CNetAccept::~CNetAccept()
@@ -22,7 +26,7 @@ void CNetAccept::Init(CIOCP *pIOCP)
 	m_pIOCP = pIOCP;
 	
 	//有数据进来？
-	if (m_SocketServer.m_nPort)
+	if (m_bHasInitSocket)
 	{
 		InitThread();
 	}	
@@ -42,6 +46,10 @@ void CNetAccept::InitThread()
 void CNetAccept::ReleaseThread()
 {
 	m_bThreadRun = false;
+	if (!m_hThreadAccept)
+	{
+		return;
+	}
 
 	IFn( WAIT_FAILED==WaitForSingleObject(m_hThreadAccept, INFINITE) )
 	{
@@ -50,7 +58,7 @@ void CNetAccept::ReleaseThread()
 	CloseHandle(m_hThreadAccept);
 }
 
-bool CNetAccept::SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
+bool CNetAccept::CreateServerSocket(const char* pName, const char* pListenIP, USHORT nListenPort)
 {	
 	//服务端套接字，初始化的时候必须成功
 	memcpy(m_SocketServer.m_szName, pName, sizeof(m_SocketServer.m_szName)-1);
@@ -64,6 +72,8 @@ bool CNetAccept::SetSocketServer(const char* pName, const char* pListenIP, USHOR
 	INITASSERT( !m_SocketServer.m_OverlappedAccept.hEvent );
 	INITASSERT( !CSocketAPI::InitSocketTCPS(m_SocketServer.m_nSocket, m_SocketServer.m_nIP, m_SocketServer.m_nPort));
 	INITASSERT( !InitAccpetExlpfn(&m_SocketServer));
+
+	m_bHasInitSocket = true;
 	
 	return true;
 }

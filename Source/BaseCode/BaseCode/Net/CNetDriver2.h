@@ -43,8 +43,8 @@ public:
 		@AddClientSocket
 		@增加一个connect套接字	
 	*/
-	bool SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort);	
-	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort);
+	bool CreateServerSocket(const char* pName, const char* pListenIP, USHORT nListenPort);	
+	bool CreateConnectSocket(const char* pConnectIP, USHORT nConnectPort);
 
 	/*
 		@CloseNet

@@ -1,14 +1,14 @@
 #include "NetAPI.h"
 
 
-bool net::SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
+bool net::CreateServerSocket(const char* pName, const char* pListenIP, USHORT nListenPort)
 {
-	return g_NetDriver2.SetSocketServer(pName, pListenIP, nListenPort);
+	return g_NetDriver2.CreateServerSocket(pName, pListenIP, nListenPort);
 }
 
-bool net::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
+bool net::CreateConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 {
-	return g_NetDriver2.AddConnectSocket(pConnectIP, nConnectPort);
+	return g_NetDriver2.CreateConnectSocket(pConnectIP, nConnectPort);
 }
 
 void net::Init()

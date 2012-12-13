@@ -25,7 +25,7 @@ public:
 	void Init();
 	CIOCP* GetIOCP();
 
-	bool AddConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
+	bool CreateConnectSocket(const char* pConnectIP, USHORT nConnectPort, bool bAutoConnect = true);
 	bool SendToBufferByNetKey(IPacketHead* pPacketHead, unsigned int nNetKey);
 	void CloseClientSocketByNetKey(unsigned int nNetKey);
 private:
@@ -35,6 +35,7 @@ private:
 
 	void InitThread();
 	void ReleaseThread();
+	void ReleaseSocket();
  
 	/*
 		这几个API表示了核心的几个工作
@@ -75,6 +76,7 @@ private:
 public:
 
 private:
+	bool m_bHasInitSocket;
 	CIOCP m_IOCP;
 
 	//线程数据
@@ -82,16 +84,10 @@ private:
 	volatile bool m_bThreadRun;	
 	unsigned int   m_uThreadLoop;
 	
-	/*
-		现在SocketClient的hash表，当逻辑层传错误包时，网络层可能已经删除这个对象，
-		故要先检测是否存在该值
-	*/
-	typedef map<unsigned int,CSocketClient *> HASH_SOCKETCLIENT;
-	HASH_SOCKETCLIENT m_HashSocketClient;
+	//管理所有套接字。key为和逻辑层之间唯一标识信息
+	typedef map<unsigned int,CSocketClient *> MAP_SOCKETCLIENT;
+	MAP_SOCKETCLIENT m_mapAllClientSocket;
 
 	//需要重连的套接字
 	CList m_lstConnect;
-
-	//管理所有连接的链表
-	CList m_lstAllSocketClient;
 };

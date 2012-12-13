@@ -18,25 +18,19 @@ CNetDriver2::~CNetDriver2()
 	Release();
 }
 
-bool CNetDriver2::SetSocketServer(const char* pName, const char* pListenIP, USHORT nListenPort)
+bool CNetDriver2::CreateServerSocket(const char* pName, const char* pListenIP, USHORT nListenPort)
 {
-	IF(m_bHasInit)
-		return false;
-
 	INITASSERT(!pName || !pListenIP);
-	INITASSERT(!m_NetAccept.SetSocketServer(pName, pListenIP, nListenPort));
+	INITASSERT(!m_NetAccept.CreateServerSocket(pName, pListenIP, nListenPort));
 	
 	m_bHasInit = true;
 	return true;
 }
 
-bool CNetDriver2::AddConnectSocket(const char* pConnectIP, USHORT nConnectPort)
+bool CNetDriver2::CreateConnectSocket(const char* pConnectIP, USHORT nConnectPort)
 {
-	IF(m_bHasInit)
-		return false;
-
 	INITASSERT(!pConnectIP);
-	INITASSERT(!m_NetKernel.AddConnectSocket(pConnectIP, nConnectPort));
+	INITASSERT(!m_NetKernel.CreateConnectSocket(pConnectIP, nConnectPort));
 
 	m_bHasInit = true;
 	return true;

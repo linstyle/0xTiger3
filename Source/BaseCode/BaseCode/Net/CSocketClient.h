@@ -94,7 +94,6 @@ public:
 		m_lConnectNode:  CNetKernel:m_lstAllSocketClient π”√
 	*/
 	struct list_head m_lConnectNode;
-	struct list_head m_lAllSocketClient;
 private:
 
 };
