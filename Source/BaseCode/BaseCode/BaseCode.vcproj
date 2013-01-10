@@ -695,11 +695,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Msg\PInnerTransfer.cpp"
+				RelativePath=".\Msg\PInnerTransferToLogic.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Msg\PInnerTransfer.h"
+				RelativePath=".\Msg\PInnerTransferToLogic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Msg\PInnerTransferToNet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Msg\PInnerTransferToNet.h"
 				>
 			</File>
 			<File
