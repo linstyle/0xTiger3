@@ -193,7 +193,7 @@ void CNetKernel::CloseClientSocket(CSocketClient *pSocketClient,bool bNotifyLogi
 	//通知逻辑层，表示这个错误是网络层主动发起的
 	if(bNotifyLogic)
 	{
-		PInnerTransfer msgInnerTransfer;
+		PInnerTransferToNet msgInnerTransfer;
 		IFn( !msgInnerTransfer.CreateNtoLErr(pSocketClient->GetKey()) )
 		{
 			return;
@@ -392,7 +392,7 @@ void CNetKernel::OnRecvSocket(CSocketClient *pSocketClient)
 	CCircleBuffer* pCircleBuffer = &pSocketClient->m_RecvBuffer;
 	while(1)
 	{
-		PInnerTransfer msgInnerTransfer;
+		PInnerTransferToNet msgInnerTransfer;
 
 		//读头部数据大小字段
 		if( !pCircleBuffer->TryReadBuffer((char*)&msgInnerTransfer,  NET_PACKET_HEAD_SIZE) )

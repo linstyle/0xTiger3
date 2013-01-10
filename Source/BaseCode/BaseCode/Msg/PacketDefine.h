@@ -19,7 +19,8 @@
 enum PACKET_DEFINE1
 {
 	PACKET1_MIN,
-	PACKET1_INNER_NET_LOGIC_QUEUE = 0,   //内部通讯，网络层和逻辑层的队列操作
+	PACKET1_INNER_TO_NET = 0,			 //内部通讯，逻辑层给网络层
+	PACKET1_INNER_TO_LOGIC = 1,			 //内部通讯，网络层给逻辑层	
 
 	PACKET1_MAX = 1000,  //预分配不要太大，跟CPacketFactory数组挂钩
 };

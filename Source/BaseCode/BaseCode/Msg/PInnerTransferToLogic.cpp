@@ -1,9 +1,9 @@
 #include "CNetKernel.h"
 #include "PInnerTransfer.h"
 
-initialiseSingleton(POInnerTransfer);
+initialiseSingleton(POInnerTransferToNet);
 
-PInnerTransfer::PInnerTransfer()
+PInnerTransferToNet::PInnerTransferToNet()
 {
 	//将指针悬挂到基类的BUFFER
 	m_pUnionBuffer = GetPacketBuffer();
@@ -16,23 +16,23 @@ PInnerTransfer::PInnerTransfer()
 	
 }
 
-unsigned int PInnerTransfer::GetNetKey()
+unsigned int PInnerTransferToNet::GetNetKey()
 {
 	return m_pInnerTransfer->m_nNetKey;
 }
 
-P_INNER_TRANSFER* PInnerTransfer::GetInnerTransferPacket()
+P_INNER_TRANSFER* PInnerTransferToNet::GetInnerTransferPacket()
 {
 	return m_pInnerTransfer;
 }
 
-P_INNER_TRANSFER_ERR* PInnerTransfer::GetErrInnerTransferPacket()
+P_INNER_TRANSFER_ERR* PInnerTransferToNet::GetErrInnerTransferPacket()
 {
 	return m_pErrInnerTransfer;
 }
 
 
-bool PInnerTransfer::CreateNtoL(unsigned int nNetKey)
+bool PInnerTransferToNet::CreateNtoL(unsigned int nNetKey)
 {
 	m_pInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
 	m_pInnerTransfer->m_nPacketDefine2 = D2_INNER_N_TO_L_SEND;
@@ -43,7 +43,7 @@ bool PInnerTransfer::CreateNtoL(unsigned int nNetKey)
 	return true;
 }
 
-bool PInnerTransfer::CreateNtoLErr(unsigned int nNetKey)
+bool PInnerTransferToNet::CreateNtoLErr(unsigned int nNetKey)
 {
 	m_pErrInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
 	m_pErrInnerTransfer->m_nPacketDefine2 = D2_INNER_N_TO_L_ERR;
@@ -54,14 +54,14 @@ bool PInnerTransfer::CreateNtoLErr(unsigned int nNetKey)
 	return true;
 }
 
-bool PInnerTransfer::CreateLtoN(unsigned int nNetKey, const char* pLogicPacket, unsigned short nLogicPacketSize)
+bool PInnerTransferToNet::CreateLtoN(unsigned int nNetKey, const char* pLogicPacket, unsigned short nLogicPacketSize)
 {
 	if (nLogicPacketSize > NET_PACKET_BUFF_SIZE)
 	{
 		return false;
 	}
 
-	m_pInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
+	m_pInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_TO_NET;
 	m_pInnerTransfer->m_nPacketDefine2 = D2_INNER_L_TO_N_SEND;
 	m_pInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER);
 
@@ -71,9 +71,9 @@ bool PInnerTransfer::CreateLtoN(unsigned int nNetKey, const char* pLogicPacket, 
 	return true;
 }
 
-bool PInnerTransfer::CreateLtoNErr(unsigned int nNetKey)
+bool PInnerTransferToNet::CreateLtoNErr(unsigned int nNetKey)
 {
-	m_pErrInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_NET_LOGIC_QUEUE;
+	m_pErrInnerTransfer->m_nPacketDefine1 = PACKET1_INNER_TO_NET;
 	m_pErrInnerTransfer->m_nPacketDefine2 = D2_INNER_L_TO_N_ERR;
 	m_pErrInnerTransfer->m_nPacketSize = sizeof(P_INNER_TRANSFER_ERR);
 
@@ -86,12 +86,12 @@ bool PInnerTransfer::CreateLtoNErr(unsigned int nNetKey)
 /****************************
 	IPacketObject
 *****************************/
-void POInnerTransfer::Execute(IPacketHead* pPacketHead)
+void POInnerTransferToNet::Execute(IPacketHead* pPacketHead)
 {
 	IFn(!pPacketHead)
 		return;
 
-	PInnerTransfer* pPInnerTransfer = (PInnerTransfer*)pPacketHead;
+	PInnerTransferToNet* pPInnerTransfer = (PInnerTransferToNet*)pPacketHead;
 	IFn(!pPInnerTransfer)
 		return;
 
@@ -102,7 +102,7 @@ void POInnerTransfer::Execute(IPacketHead* pPacketHead)
 	switch(pPacketHead->GetPacketDefine2())
 	{
 	case D2_INNER_N_TO_L_SEND:
-		g_PacketFactory.ProcessMsg( (IPacketHead*)(pPInnerTransfer->GetInnerTransferPacket()) );
+		g_NetPacketFactory.ProcessMsg( (IPacketHead*)(pPInnerTransfer->GetInnerTransferPacket()) );
 		break;
 
 	case D2_INNER_N_TO_L_ERR:

@@ -2,8 +2,8 @@
 #include "GlobalFunction.h"
 #include "CLog2.0.h"
 
-
-initialiseSingleton(CPacketFactory);
+CPacketFactory* g_LoigcPacketFactory = NULL;
+CPacketFactory* g_NetPacketFactory = NULL;
 
 CPacketFactory::CPacketFactory()
 {

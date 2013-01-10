@@ -42,14 +42,16 @@ enum
 	D2_INNER_L_TO_N_ERR = 3,   //逻辑层给网络层,需要发送出去
 };
 
+
+
 /****************************
 	你的协议类定义,继承IPackHead
 	1)以P打头
 *****************************/
-class PInnerTransfer:public IPacketHead
+class PInnerTransferToLogic:public IPacketHead
 {
 public:
-	PInnerTransfer();
+	PInnerTransferToLogic();
 
 	unsigned int GetNetKey();
 	P_INNER_TRANSFER* GetInnerTransferPacket();
@@ -58,10 +60,6 @@ public:
 	//网络到逻辑层，这里提升效率，不用外部拷贝，直接GetPacketBuffer()出去考别
 	bool CreateNtoL(unsigned int nNetKey);
 	bool CreateNtoLErr(unsigned int nNetKey);
-
-	//逻辑到网络层
-	bool CreateLtoN(unsigned int nNetKey, const char* pLogicPacket, unsigned short nLogicPacketSize);
-	bool CreateLtoNErr(unsigned int nNetKey);
 	
 private:
 
@@ -80,13 +78,13 @@ private:
 /****************************
 	你的包工厂定义,用于管理收到包后的处理
 	继承IPacketObject和一个单体
-*****************************/
-class POInnerTransfer:public Singleton<POInnerTransfer>, public IPacketObject
+	*****************************/
+class POInnerTransferToLogic:public Singleton<POInnerTransferToLogic>, public IPacketObject
 { 
 public:
-	POInnerTransfer():IPacketObject(PACKET1_INNER_NET_LOGIC_QUEUE)
+	POInnerTransferToLogic():IPacketObject(PACKET1_INNER_TO_LOGIC)
 	{
-		g_PacketFactory.AddPacketObject(this);
+		g_LoigcPacketFactory.AddPacketObject(this);
 	}
 
 	virtual void Execute(IPacketHead* pPacketHead) ;

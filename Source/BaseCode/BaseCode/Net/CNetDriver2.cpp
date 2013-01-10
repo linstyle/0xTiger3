@@ -41,7 +41,7 @@ bool CNetDriver2::CloseNet(CBasePlayer* pBasePlayer)
 	IF(!pBasePlayer)
 		return false;
 
-	PInnerTransfer msgInnerTransfer;
+	PInnerTransferToNet msgInnerTransfer;
 	IF(!msgInnerTransfer.CreateLtoNErr( pBasePlayer->GetNetKey() ))
 		return false;
 

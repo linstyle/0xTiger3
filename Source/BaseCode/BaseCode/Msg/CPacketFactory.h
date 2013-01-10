@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include "Singleton.h"
 #include "PPackets.h"
 
 
-class CPacketFactory:public Singleton<CPacketFactory>
+class CPacketFactory
 {
 public:
 	CPacketFactory();
@@ -39,4 +38,5 @@ private:
 
 };
 
-#define g_PacketFactory CPacketFactory::getSingleton()
+extern CPacketFactory* g_LoigcPacketFactory;
+extern CPacketFactory* g_NetPacketFactory;
